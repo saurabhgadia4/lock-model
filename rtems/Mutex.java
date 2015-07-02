@@ -39,13 +39,25 @@ public class Mutex extends Lock {
 				assert (thisThread.currentPriority == thisThread.getPriority());
 				try{
 					thisThread.state = Thread.State.WAITING;
-					if(priorityRaiseFilter(thisThread.currentPriority))
+					/*if(priorityRaiseFilter(thisThread.currentPriority))
 					{
 						System.out.println("raising priority of thread: "+ holder.getId() + "by thread : " + thisThread.getId()+" frm :"+holder.currentPriority + " to: "+ thisThread.currentPriority);
 						updatePriority(thisThread.currentPriority);
 						System.out.println("updated pr for tid: "+holder.getId() +" current pr: "+holder.currentPriority);
 						
-					}
+					}*/
+					/* above is commented because we need to address indirect reference problem. In all cases
+					   we should recursively update priority and should not compare with current priority. for ex.
+					   thread 1 has mutex 0, 1, 2--->running. It acquired all mutex at priority=3. Now thread 3 of 
+					   priority=1 tries to acquire mutex 2. Thus thread 1 priority now promoted to 1. After it will
+					   release mutex 2 its priority will be reset to 3 again. Now lets say thread 2 of priority 2 tries to acquire 
+					   mutex 0, now according to priorityRaiseFilter we will see that thread 1 is at priority 1 and
+					   so no promotion required. But when thread 1 will release mutex 2 its priority will be reset to 3
+					   and it still has mutex (0, 1) and on mutex 0 thread 2 with priorty =2 is still waiting. 
+					   So it violation and we need to address this problem. 
+
+					*/
+					updatePriority(thisThread.currentPriority);
 					if(waitQueue.contains(thisThread)==false){
 						System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
 						waitQueue.offer(thisThread);
@@ -174,8 +186,10 @@ there should be no higher priority thread contending on any of the mutex still h
 
 	public void updateNonRecPriority(int priority)
 	{
+		if(holder.currentPriority > priority){
 		holder.currentPriority = priority;
 		holder.setPriority(priority);
+		}
 
 	}
 
@@ -184,18 +198,27 @@ there should be no higher priority thread contending on any of the mutex still h
 		int i;
 		Mutex candidate;
 		int mutexIdx = this.holder.getMutexIndex(this);
+		int stopflag = 0;
 		assert this.holder!=null;		
 		//Assertion check
 		assert mutexIdx!=-1;
 		for(i=mutexIdx-1;i>=0;i--)
 		{
 			candidate = holder.mutexOrderList.get(i);
-			if(candidate.priorityBefore < priority)
+			if(candidate.priorityBefore < priority){
+				stopflag = 1;
 				break;
+			}
 			candidate.priorityBefore = priority;
 		}
-		holder.currentPriority = priority;
-		holder.setPriority(priority);
+		if(stopflag==0){
+			/*
+				this check is added because we don't need to change priority
+			*/
+			holder.currentPriority = priority;
+			holder.setPriority(priority);	
+		}
+		
 
 		/* need to include fix for spsem03 test case of indirect reference */
 	

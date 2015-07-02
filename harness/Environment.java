@@ -47,18 +47,6 @@ public class Environment {
     RTEMSThread t2 = new TestThread(new int[]{1, 2}, 1);
     t2.start();
 
-
-    /*for (int i = 1; i < N_THREADS; i++) {
-      int li = i;
-      RTEMSThread t = new TestThread(new int[]{li});
-      t.setPriority(i);
-      t.setRealPriority();
-      t.setCurrentPriority();
-      System.out.println("Thread " + Integer.toString(i + 1) +
-			 " has priority " + t.getPriority() +
-			 " and uses lock " + li + ".");
-      t.start();
-    }*/
     System.exit(1);
   }
 }
