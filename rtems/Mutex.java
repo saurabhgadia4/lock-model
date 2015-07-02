@@ -215,8 +215,12 @@ there should be no higher priority thread contending on any of the mutex still h
 			/*
 				this check is added because we don't need to change priority
 			*/
-			holder.currentPriority = priority;
-			holder.setPriority(priority);	
+			if(holder.currentPriority > priority)
+			{
+				holder.currentPriority = priority;
+				holder.setPriority(priority);	
+			}
+				
 		}
 		
 
