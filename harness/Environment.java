@@ -15,7 +15,7 @@ public class Environment {
   */
 
   public final static int model = Mutex.REC_UPDATE;
-  static final Lock[] locks = { createLock(0), createLock(1), createLock(2) };
+  static final Lock[] locks = {createLock(0), createLock(1), createLock(2)};
 
   static Lock createLock(int id) {
     // factory method to swap out lock impl. in one place
@@ -26,19 +26,29 @@ public class Environment {
     /*int li1 = Verify.getInt(0, locks.length - 1);
     int li2 = Verify.getInt(0, locks.length - 1);
     int li3 = Verify.getInt(0, locks.length - 1);*/
-    int li1 = 1;
-    int li2 = 2;
+    int li1 = 0;
+    int li2 = 1;
     Mutex.setUpdateMethod(model);
-    RTEMSThread t0 = new TestThread(new int[]{li1, li2});
+    RTEMSThread t0 = new TestThread(new int[]{li1, li2}, 3);
     //t0.setPriority(Verify.getInt(1, 3));
     t0.setPriority(3);
-    t0.setRealPriority();
-    t0.setCurrentPriority();
+    t0.setRealPriority(3);
+    t0.setCurrentPriority(3);
     System.out.println("Thread 0 has priority " + t0.getPriority() +
 		       " and uses locks " + li1 + //", " + li2 +
 		       ", and " + li2 + ".");
     t0.start();
-    for (int i = 1; i < N_THREADS; i++) {
+    
+    //Creating thread 1 trying to acquire lock 2, lock 0
+    RTEMSThread t1 = new TestThread(new int[]{2, 0}, 2);
+    t1.start();
+
+    //creating thread 2 trying to acquire lock1, lock2
+    RTEMSThread t2 = new TestThread(new int[]{2, 0}, 1);
+    t2.start();
+
+
+    /*for (int i = 1; i < N_THREADS; i++) {
       int li = i;
       RTEMSThread t = new TestThread(new int[]{li});
       t.setPriority(i);
@@ -48,7 +58,7 @@ public class Environment {
 			 " has priority " + t.getPriority() +
 			 " and uses lock " + li + ".");
       t.start();
-    }
+    }*/
     System.exit(1);
   }
 }

@@ -8,8 +8,8 @@ public class TestThread extends RTEMSThread {
   int idx[]; // for simpler diagnosis later (if I get some help on JPF)
   Lock locks[];
 
-  public TestThread(int lockIdx[]) {
-    super();
+  public TestThread(int lockIdx[], int priority) {
+    super(priority);
     idx = lockIdx;
     locks = new Lock[idx.length];
     for (int i = 0; i < idx.length; i++) {
