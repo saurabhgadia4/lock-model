@@ -186,9 +186,7 @@ there should be no higher priority thread contending on any of the mutex still h
 		int mutexIdx = this.holder.getMutexIndex(this);
 		assert this.holder!=null;		
 		//Assertion check
-		System.out.println("checking rec assert");
 		assert mutexIdx!=-1;
-		System.out.println("rec assert passed");
 		for(i=mutexIdx-1;i>=0;i--)
 		{
 			candidate = holder.mutexOrderList.get(i);
