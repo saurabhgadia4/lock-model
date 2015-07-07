@@ -76,16 +76,10 @@ public class Mutex extends Lock {
 			assert thisThread.getState() != Thread.State.WAITING;
 			if(holder==null)
 			{
-				holder = thisThread;
-				assert nestCount==0;
-			}
-			if(nestCount==0)
-			{
-				assert !(thisThread.mutexOrderList.contains(this));
 				System.out.println("thread: "+thisThread.getId() + "adding mutex: "+ id + " to its mutexOrderList");
-				priorityBefore = thisThread.currentPriority;
-				thisThread.mutexOrderList.add(0, this);
-				assert thisThread.mutexOrderList.contains(this);
+				holder = thisThread;
+				holder.pushMutex(this);
+				assert nestCount==0;
 			}
 			nestCount++;
 			thisThread.resourceCount++;
@@ -124,6 +118,8 @@ public class Mutex extends Lock {
 				holder.state = Thread.State.RUNNABLE;
 				holder.wait = null;
 				holder.trylock = null;
+				// We need to push this mutex entry in mutexOrderList of new holder.(Bug test_2_0)
+				holder.pushMutex(this);
 				globalLock.notifyAll();
 			}
 		}			
@@ -197,9 +193,11 @@ there should be no higher priority thread contending on any of the mutex still h
 	{
 		int i;
 		Mutex candidate;
+		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 		int mutexIdx = this.holder.getMutexIndex(this);
 		int stopflag = 0;
-		assert this.holder!=null;		
+		assert this.holder!=null;	
+		assert this.holder!= thisThread;	
 		//Assertion check
 		assert mutexIdx!=-1;
 		for(i=mutexIdx-1;i>=0;i--)
