@@ -59,12 +59,12 @@ public class Mutex extends Lock {
 					*/
 					updatePriority(thisThread.currentPriority);
 					if(waitQueue.contains(thisThread)==false){
-						System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+						//System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
 						waitQueue.offer(thisThread);
 					}
 					thisThread.wait = waitQueue;
 					thisThread.trylock = this;
-					validator();
+					//validator();
 					globalLock.wait();
 							
 					}catch (InterruptedException e) 
@@ -76,7 +76,7 @@ public class Mutex extends Lock {
 			assert thisThread.getState() != Thread.State.WAITING;
 			if(holder==null)
 			{
-				System.out.println("thread: "+thisThread.getId() + "adding mutex: "+ id + " to its mutexOrderList");
+				//System.out.println("thread: "+thisThread.getId() + "adding mutex: "+ id + " to its mutexOrderList");
 				holder = thisThread;
 				holder.pushMutex(this);
 				assert nestCount==0;
@@ -103,7 +103,7 @@ public class Mutex extends Lock {
 			topMutex = thisThread.mutexOrderList.remove(0);
 		//<---------------------------------------------------------------Thread 1 crosses this-------------->
 
-			System.out.println("Holder Thread: "+thisThread.getId()+"before resetting priority_before : "+ thisThread.getPriority()+" while releasing mutex: " + id);
+			//System.out.println("Holder Thread: "+thisThread.getId()+"before resetting priority_before : "+ thisThread.getPriority()+" while releasing mutex: " + id);
 			thisThread.setPriority(priorityBefore);
 			thisThread.currentPriority = priorityBefore;
 			System.out.println("Holder Thread: "+thisThread.getId()+ " after stepdown ops-->current priority: " + thisThread.getPriority() + " while releasing mutex: " + id);
@@ -142,7 +142,7 @@ there should be no higher priority thread contending on any of the mutex still h
 			chkThr = chkMtx.waitQueue.peek();
 			if(chkThr!=null)
 			{
-				System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
+				//System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
 				assert (thisThread.getPriority()<=chkThr.getPriority());	
 			}
 			
