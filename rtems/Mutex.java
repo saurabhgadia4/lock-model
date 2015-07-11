@@ -73,7 +73,7 @@ public class Mutex extends Lock {
 		assert thisThread.getState() != Thread.State.WAITING;
 		if(holder==null)
 		{
-			System.out.println("thread: "+thisThread.getId() + "adding mutex: "+ id + " to its mutexOrderList");
+			//System.out.println("thread: "+thisThread.getId() + "adding mutex: "+ id + " to its mutexOrderList");
 			holder = thisThread;
 			holder.pushMutex(this);
 			assert nestCount==0;
@@ -99,7 +99,7 @@ public class Mutex extends Lock {
 			topMutex = thisThread.mutexOrderList.remove(0);
 		//<---------------------------------------------------------------Thread 1 crosses this-------------->
 
-			System.out.println("Holder Thread: "+thisThread.getId()+"before resetting priority_before : "+ thisThread.getPriority()+" while releasing mutex: " + id);
+			//System.out.println("Holder Thread: "+thisThread.getId()+"before resetting priority_before : "+ thisThread.getPriority()+" while releasing mutex: " + id);
 			thisThread.setPriority(priorityBefore);
 			thisThread.currentPriority = priorityBefore;
 			System.out.println("Holder Thread: "+thisThread.getId()+ " after stepdown ops-->current priority: " + thisThread.getPriority() + " while releasing mutex: " + id);
@@ -226,7 +226,7 @@ there should be no higher priority thread contending on any of the mutex still h
 		//if holder thread is waiting on someother mutex reenqueue that thread with updated priority.
 		PriorityQueue<RTEMSThread> pqueue;
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-		System.out.println("thread: "+holder.getId()+" being re-enqued by thread: " + thisThread.getId());
+		//System.out.println("thread: "+holder.getId()+" being re-enqued by thread: " + thisThread.getId());
 		pqueue = holder.wait;
 		pqueue.remove(holder);
 		pqueue.offer(holder);

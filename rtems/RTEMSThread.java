@@ -19,7 +19,7 @@ public class RTEMSThread extends Thread {
 		this.state = this.getState();
 		this.setPriority(priority);
 		this.currentPriority = this.realPriority = this.getPriority();
-		System.out.println("setting priority = "+getPriority() + " for thread: "+getId());
+		//System.out.println("setting priority = "+getPriority() + " for thread: "+getId());
 		this.trylock = null;
 	}
 
