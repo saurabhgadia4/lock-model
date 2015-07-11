@@ -6,3 +6,8 @@
 
 = Wiki page link=
 * [https://devel.rtems.org/wiki/GSoC/2015/NestedMutex link] 
+
+== Branch Objective ==
+
+* This branch deals with attempt to remove biglock from JPF model.
+
