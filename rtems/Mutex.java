@@ -12,7 +12,6 @@ public class Mutex extends Lock {
 	int priorityBefore=-1;
 	MyComparator comparator = new MyComparator();
 	PriorityQueue<RTEMSThread> waitQueue = new PriorityQueue<RTEMSThread>(7, comparator);
-	static Object globalLock = new Object(); // models kernel-wide lock
 	public static final int REC_UPDATE = 1;
   	public static final int NONREC_UPDATE = 0;
 	public static int USE_MODEL=NONREC_UPDATE;
@@ -31,63 +30,60 @@ public class Mutex extends Lock {
 		USE_MODEL = method;
 	}
 
-	public void lock() {
-		synchronized(globalLock) {
-			RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-			while((holder!=null) && (holder!=thisThread))
-			{
-				assert (thisThread.currentPriority == thisThread.getPriority());
-				try{
-					thisThread.state = Thread.State.WAITING;
-					/*if(priorityRaiseFilter(thisThread.currentPriority))
-					{
-						System.out.println("raising priority of thread: "+ holder.getId() + "by thread : " + thisThread.getId()+" frm :"+holder.currentPriority + " to: "+ thisThread.currentPriority);
-						updatePriority(thisThread.currentPriority);
-						System.out.println("updated pr for tid: "+holder.getId() +" current pr: "+holder.currentPriority);
-						
-					}*/
-					/* above is commented because we need to address indirect reference problem. In all cases
-					   we should recursively update priority and should not compare with current priority. for ex.
-					   thread 1 has mutex 0, 1, 2--->running. It acquired all mutex at priority=3. Now thread 3 of 
-					   priority=1 tries to acquire mutex 2. Thus thread 1 priority now promoted to 1. After it will
-					   release mutex 2 its priority will be reset to 3 again. Now lets say thread 2 of priority 2 tries to acquire 
-					   mutex 0, now according to priorityRaiseFilter we will see that thread 1 is at priority 1 and
-					   so no promotion required. But when thread 1 will release mutex 2 its priority will be reset to 3
-					   and it still has mutex (0, 1) and on mutex 0 thread 2 with priorty =2 is still waiting. 
-					   So it violation and we need to address this problem. 
-
-					*/
+	public synchronized void lock() {
+		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+		while((holder!=null) && (holder!=thisThread))
+		{
+			assert (thisThread.currentPriority == thisThread.getPriority());
+			try{
+				thisThread.state = Thread.State.WAITING;
+				/*if(priorityRaiseFilter(thisThread.currentPriority))
+				{
+					System.out.println("raising priority of thread: "+ holder.getId() + "by thread : " + thisThread.getId()+" frm :"+holder.currentPriority + " to: "+ thisThread.currentPriority);
 					updatePriority(thisThread.currentPriority);
-					if(waitQueue.contains(thisThread)==false){
-						System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
-						waitQueue.offer(thisThread);
-					}
-					thisThread.wait = waitQueue;
-					thisThread.trylock = this;
-					validator();
-					globalLock.wait();
-							
-					}catch (InterruptedException e) 
-					{}
-				
-			}
-			//if code reaches here it means it has the potential to acquire the mutex
-			System.out.println("thread-id:"+ thisThread.getId() + " acquiring mutex "+ id);
-			assert thisThread.getState() != Thread.State.WAITING;
-			if(holder==null)
-			{
-				System.out.println("thread: "+thisThread.getId() + "adding mutex: "+ id + " to its mutexOrderList");
-				holder = thisThread;
-				holder.pushMutex(this);
-				assert nestCount==0;
-			}
-			nestCount++;
-			thisThread.resourceCount++;
+					System.out.println("updated pr for tid: "+holder.getId() +" current pr: "+holder.currentPriority);
+					
+				}*/
+				/* above is commented because we need to address indirect reference problem. In all cases
+				   we should recursively update priority and should not compare with current priority. for ex.
+				   thread 1 has mutex 0, 1, 2--->running. It acquired all mutex at priority=3. Now thread 3 of 
+				   priority=1 tries to acquire mutex 2. Thus thread 1 priority now promoted to 1. After it will
+				   release mutex 2 its priority will be reset to 3 again. Now lets say thread 2 of priority 2 tries to acquire 
+				   mutex 0, now according to priorityRaiseFilter we will see that thread 1 is at priority 1 and
+				   so no promotion required. But when thread 1 will release mutex 2 its priority will be reset to 3
+				   and it still has mutex (0, 1) and on mutex 0 thread 2 with priorty =2 is still waiting. 
+				   So it violation and we need to address this problem. 
+
+				*/
+				updatePriority(thisThread.currentPriority);
+				if(waitQueue.contains(thisThread)==false){
+					System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+					waitQueue.offer(thisThread);
+				}
+				thisThread.wait = waitQueue;
+				thisThread.trylock = this;
+				wait();
+						
+				}catch (InterruptedException e) 
+				{}
+			
 		}
+		//if code reaches here it means it has the potential to acquire the mutex
+		System.out.println("thread-id:"+ thisThread.getId() + " acquiring mutex "+ id);
+		assert thisThread.getState() != Thread.State.WAITING;
+		if(holder==null)
+		{
+			System.out.println("thread: "+thisThread.getId() + "adding mutex: "+ id + " to its mutexOrderList");
+			holder = thisThread;
+			holder.pushMutex(this);
+			assert nestCount==0;
+		}
+		nestCount++;
+		thisThread.resourceCount++;
+	
 	}
 
-	public void unlock() {
-		synchronized(globalLock) {
+	public synchronized void unlock() {
 		Mutex topMutex=null;
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 		RTEMSThread candidateThr;
@@ -120,10 +116,9 @@ public class Mutex extends Lock {
 				holder.trylock = null;
 				// We need to push this mutex entry in mutexOrderList of new holder.(Bug test_2_0)
 				holder.pushMutex(this);
-				globalLock.notifyAll();
+				notifyAll();
 			}
 		}			
-		}
 	}
 
 /*
