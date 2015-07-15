@@ -211,7 +211,7 @@ there should be no higher priority thread contending on any of the mutex still h
 		}
 		if(stopflag==0){
 			/*
-				this check is added because we don't need to change priority
+				this check is added because we don't need to change priority whenn stopflag==1
 			*/
 			if(holder.currentPriority > priority)
 			{
