@@ -1,0 +1,999 @@
+Script started on Tue 14 Jul 2015 11:09:42 PM PDT
+]0;saurabh@saurabh-Inspiron-N5010: ~/model_checking/new2-lockmodel/lock-modelsaurabh@saurabh-Inspiron-N5010:~/model_checking/new2-lockmodel/lock-model$ ./compile.sh 
+]0;saurabh@saurabh-Inspiron-N5010: ~/model_checking/new2-lockmodel/lock-modelsaurabh@saurabh-Inspiron-N5010:~/model_checking/new2-lockmodel/lock-model$ ./jpf.sh 
+JavaPathfinder core system v8.0 (rev 25+) - (C) 2005-2014 United States Government. All rights reserved.
+
+
+====================================================== system under test
+harness.Environment.main()
+
+====================================================== search started: 7/14/15 11:09 PM
+Thread 0 has priority 3 and uses locks 0, and 1.
+--->Mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+------>Thread-id: 2 priority: 2
+------>Thread-id: 2 priority: 2
+------>Thread-id: 2 priority: 2
+------>Thread-id: 2 priority: 2
+Adding thread :2 in waitQ of mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+--->Mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+--->Mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+--->Mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+Adding thread :2 in waitQ of mutex: 0
+------>Thread-id: 2 priority: 2
+
+====================================================== error 1
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.AssertionError
+	at rtems.Mutex.validator(Mutex.java:125)
+	at rtems.Mutex.unlock(Mutex.java:90)
+	at harness.TestThread.run(TestThread.java:25)
+
+
+====================================================== trace #1
+------------------------------------------------------ transition #0 thread: 0
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"ROOT" ,1/1,isCascaded:false}
+      [3157 insn w/o sources]
+  harness/Environment.java:18    : static final Lock[] locks = {createLock(0), createLock(1), createLock(2)};
+  harness/Environment.java:22    : return new /*Prio*/Mutex(id);
+      [1 insn w/o sources]
+  rtems/Mutex.java:8             : public class Mutex extends Lock {
+      [2 insn w/o sources]
+  rtems/Mutex.java:8             : public class Mutex extends Lock {
+  rtems/Mutex.java:17            : public static int USE_MODEL=NONREC_UPDATE;
+  rtems/Mutex.java:1             : package rtems;
+  harness/Environment.java:22    : return new /*Prio*/Mutex(id);
+  rtems/Mutex.java:20            : public Mutex(int idx){
+  base/Lock.java:3               : public class Lock {
+      [1 insn w/o sources]
+  base/Lock.java:5               : int count = 0;
+  rtems/Mutex.java:12            : int priorityBefore=-1;
+  rtems/Mutex.java:13            : MyComparator comparator = new MyComparator();
+  rtems/Mutex.java:219           : class MyComparator implements Comparator<RTEMSThread>
+      [1 insn w/o sources]
+  rtems/Mutex.java:219           : class MyComparator implements Comparator<RTEMSThread>
+  rtems/Mutex.java:13            : MyComparator comparator = new MyComparator();
+  rtems/Mutex.java:14            : PriorityQueue<RTEMSThread> waitQueue = new PriorityQueue<RTEMSThread>(7, comparator);
+      [26 insn w/o sources]
+  rtems/Mutex.java:14            : PriorityQueue<RTEMSThread> waitQueue = new PriorityQueue<RTEMSThread>(7, comparator);
+  rtems/Mutex.java:22            : this.id = idx;
+  rtems/Mutex.java:23            : this.nestCount = 0;
+  rtems/Mutex.java:24            : this.priorityBefore = -1;
+  rtems/Mutex.java:25            : this.holder=null;
+  rtems/Mutex.java:26            : }
+  harness/Environment.java:22    : return new /*Prio*/Mutex(id);
+  harness/Environment.java:18    : static final Lock[] locks = {createLock(0), createLock(1), createLock(2)};
+  harness/Environment.java:22    : return new /*Prio*/Mutex(id);
+  rtems/Mutex.java:20            : public Mutex(int idx){
+  base/Lock.java:3               : public class Lock {
+      [1 insn w/o sources]
+  base/Lock.java:5               : int count = 0;
+  rtems/Mutex.java:12            : int priorityBefore=-1;
+  rtems/Mutex.java:13            : MyComparator comparator = new MyComparator();
+  rtems/Mutex.java:219           : class MyComparator implements Comparator<RTEMSThread>
+      [1 insn w/o sources]
+  rtems/Mutex.java:219           : class MyComparator implements Comparator<RTEMSThread>
+  rtems/Mutex.java:13            : MyComparator comparator = new MyComparator();
+  rtems/Mutex.java:14            : PriorityQueue<RTEMSThread> waitQueue = new PriorityQueue<RTEMSThread>(7, comparator);
+      [26 insn w/o sources]
+  rtems/Mutex.java:14            : PriorityQueue<RTEMSThread> waitQueue = new PriorityQueue<RTEMSThread>(7, comparator);
+  rtems/Mutex.java:22            : this.id = idx;
+  rtems/Mutex.java:23            : this.nestCount = 0;
+  rtems/Mutex.java:24            : this.priorityBefore = -1;
+  rtems/Mutex.java:25            : this.holder=null;
+  rtems/Mutex.java:26            : }
+  harness/Environment.java:22    : return new /*Prio*/Mutex(id);
+  harness/Environment.java:18    : static final Lock[] locks = {createLock(0), createLock(1), createLock(2)};
+  harness/Environment.java:22    : return new /*Prio*/Mutex(id);
+  rtems/Mutex.java:20            : public Mutex(int idx){
+  base/Lock.java:3               : public class Lock {
+      [1 insn w/o sources]
+  base/Lock.java:5               : int count = 0;
+  rtems/Mutex.java:12            : int priorityBefore=-1;
+  rtems/Mutex.java:13            : MyComparator comparator = new MyComparator();
+  rtems/Mutex.java:219           : class MyComparator implements Comparator<RTEMSThread>
+      [1 insn w/o sources]
+  rtems/Mutex.java:219           : class MyComparator implements Comparator<RTEMSThread>
+  rtems/Mutex.java:13            : MyComparator comparator = new MyComparator();
+  rtems/Mutex.java:14            : PriorityQueue<RTEMSThread> waitQueue = new PriorityQueue<RTEMSThread>(7, comparator);
+      [26 insn w/o sources]
+  rtems/Mutex.java:14            : PriorityQueue<RTEMSThread> waitQueue = new PriorityQueue<RTEMSThread>(7, comparator);
+  rtems/Mutex.java:22            : this.id = idx;
+  rtems/Mutex.java:23            : this.nestCount = 0;
+  rtems/Mutex.java:24            : this.priorityBefore = -1;
+  rtems/Mutex.java:25            : this.holder=null;
+  rtems/Mutex.java:26            : }
+  harness/Environment.java:22    : return new /*Prio*/Mutex(id);
+  harness/Environment.java:18    : static final Lock[] locks = {createLock(0), createLock(1), createLock(2)};
+  harness/Environment.java:1     : package harness;
+      [1 insn w/o sources]
+  harness/Environment.java:29    : int li1 = 0;
+  harness/Environment.java:30    : int li2 = 1;
+  harness/Environment.java:31    : Mutex.setUpdateMethod(model);
+  rtems/Mutex.java:30            : USE_MODEL = method;
+  rtems/Mutex.java:31            : }
+  harness/Environment.java:32    : RTEMSThread t0 = new TestThread(new int[]{li1, li2}, 3);
+      [1 insn w/o sources]
+  rtems/RTEMSThread.java:7       : public class RTEMSThread extends Thread {
+      [2 insn w/o sources]
+  rtems/RTEMSThread.java:7       : public class RTEMSThread extends Thread {
+  rtems/RTEMSThread.java:1       : package rtems;
+      [1 insn w/o sources]
+  harness/TestThread.java:7      : public class TestThread extends RTEMSThread {
+      [2 insn w/o sources]
+  harness/TestThread.java:7      : public class TestThread extends RTEMSThread {
+  harness/TestThread.java:1      : package harness;
+  harness/Environment.java:32    : RTEMSThread t0 = new TestThread(new int[]{li1, li2}, 3);
+  harness/TestThread.java:12     : super(priority);
+  rtems/RTEMSThread.java:17      : public RTEMSThread(int priority) {
+      [145 insn w/o sources]
+  rtems/RTEMSThread.java:18      : this.mutexOrderList = /*Collections.synchronizedList(*/new ArrayList<Mutex>()/*)*/;
+      [9 insn w/o sources]
+  rtems/RTEMSThread.java:18      : this.mutexOrderList = /*Collections.synchronizedList(*/new ArrayList<Mutex>()/*)*/;
+      [16 insn w/o sources]
+  rtems/RTEMSThread.java:18      : this.mutexOrderList = /*Collections.synchronizedList(*/new ArrayList<Mutex>()/*)*/;
+  rtems/RTEMSThread.java:19      : this.state = this.getState();
+      [9 insn w/o sources]
+  rtems/RTEMSThread.java:19      : this.state = this.getState();
+  rtems/RTEMSThread.java:20      : this.setPriority(priority);
+      [15 insn w/o sources]
+  rtems/RTEMSThread.java:21      : this.currentPriority = this.realPriority = this.getPriority();
+      [3 insn w/o sources]
+  rtems/RTEMSThread.java:21      : this.currentPriority = this.realPriority = this.getPriority();
+  rtems/RTEMSThread.java:23      : this.trylock = null;
+  rtems/RTEMSThread.java:24      : }
+  harness/TestThread.java:13     : idx = lockIdx;
+  harness/TestThread.java:14     : locks = new Lock[idx.length];
+  harness/TestThread.java:15     : for (int i = 0; i < idx.length; i++) {
+  harness/TestThread.java:16     : locks[i] = Environment.locks[idx[i]];
+  harness/TestThread.java:15     : for (int i = 0; i < idx.length; i++) {
+  harness/TestThread.java:16     : locks[i] = Environment.locks[idx[i]];
+  harness/TestThread.java:15     : for (int i = 0; i < idx.length; i++) {
+  harness/TestThread.java:18     : }
+  harness/Environment.java:32    : RTEMSThread t0 = new TestThread(new int[]{li1, li2}, 3);
+  harness/Environment.java:34    : t0.setPriority(3);
+      [15 insn w/o sources]
+  harness/Environment.java:35    : t0.setRealPriority(3);
+  rtems/RTEMSThread.java:31      : realPriority = priority;
+  rtems/RTEMSThread.java:32      : }
+  harness/Environment.java:36    : t0.setCurrentPriority(3);
+  rtems/RTEMSThread.java:27      : currentPriority = priority;
+  rtems/RTEMSThread.java:28      : }
+  harness/Environment.java:37    : System.out.println("Thread 0 has priority " + t0.getPriority() +
+      [2 insn w/o sources]
+  harness/Environment.java:37    : System.out.println("Thread 0 has priority " + t0.getPriority() +
+      [2 insn w/o sources]
+  harness/Environment.java:37    : System.out.println("Thread 0 has priority " + t0.getPriority() +
+      [3 insn w/o sources]
+  harness/Environment.java:37    : System.out.println("Thread 0 has priority " + t0.getPriority() +
+      [2 insn w/o sources]
+  harness/Environment.java:37    : System.out.println("Thread 0 has priority " + t0.getPriority() +
+      [2 insn w/o sources]
+  harness/Environment.java:37    : System.out.println("Thread 0 has priority " + t0.getPriority() +
+      [2 insn w/o sources]
+  harness/Environment.java:37    : System.out.println("Thread 0 has priority " + t0.getPriority() +
+      [2 insn w/o sources]
+  harness/Environment.java:37    : System.out.println("Thread 0 has priority " + t0.getPriority() +
+      [2 insn w/o sources]
+  harness/Environment.java:37    : System.out.println("Thread 0 has priority " + t0.getPriority() +
+      [2 insn w/o sources]
+  harness/Environment.java:37    : System.out.println("Thread 0 has priority " + t0.getPriority() +
+      [2 insn w/o sources]
+  harness/Environment.java:37    : System.out.println("Thread 0 has priority " + t0.getPriority() +
+      [2 insn w/o sources]
+  harness/Environment.java:40    : t0.start();
+      [1 insn w/o sources]
+------------------------------------------------------ transition #1 thread: 0
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"START" ,1/2,isCascaded:false}
+      [2 insn w/o sources]
+  harness/Environment.java:43    : RTEMSThread t1 = new TestThread(new int[]{0}, 2);
+  harness/TestThread.java:12     : super(priority);
+  rtems/RTEMSThread.java:17      : public RTEMSThread(int priority) {
+      [27 insn w/o sources]
+------------------------------------------------------ transition #2 thread: 0
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"LOCK" ,1/2,isCascaded:false}
+      [119 insn w/o sources]
+  rtems/RTEMSThread.java:18      : this.mutexOrderList = /*Collections.synchronizedList(*/new ArrayList<Mutex>()/*)*/;
+      [16 insn w/o sources]
+  rtems/RTEMSThread.java:18      : this.mutexOrderList = /*Collections.synchronizedList(*/new ArrayList<Mutex>()/*)*/;
+------------------------------------------------------ transition #3 thread: 0
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"EXPOSE" ,1/2,isCascaded:false}
+  rtems/RTEMSThread.java:18      : this.mutexOrderList = /*Collections.synchronizedList(*/new ArrayList<Mutex>()/*)*/;
+  rtems/RTEMSThread.java:19      : this.state = this.getState();
+      [9 insn w/o sources]
+  rtems/RTEMSThread.java:19      : this.state = this.getState();
+  rtems/RTEMSThread.java:20      : this.setPriority(priority);
+      [15 insn w/o sources]
+  rtems/RTEMSThread.java:21      : this.currentPriority = this.realPriority = this.getPriority();
+      [3 insn w/o sources]
+  rtems/RTEMSThread.java:21      : this.currentPriority = this.realPriority = this.getPriority();
+  rtems/RTEMSThread.java:23      : this.trylock = null;
+  rtems/RTEMSThread.java:24      : }
+  harness/TestThread.java:13     : idx = lockIdx;
+  harness/TestThread.java:14     : locks = new Lock[idx.length];
+------------------------------------------------------ transition #4 thread: 0
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"EXPOSE" ,1/2,isCascaded:false}
+  harness/TestThread.java:14     : locks = new Lock[idx.length];
+  harness/TestThread.java:15     : for (int i = 0; i < idx.length; i++) {
+  harness/TestThread.java:16     : locks[i] = Environment.locks[idx[i]];
+  harness/TestThread.java:15     : for (int i = 0; i < idx.length; i++) {
+  harness/TestThread.java:18     : }
+  harness/Environment.java:43    : RTEMSThread t1 = new TestThread(new int[]{0}, 2);
+  harness/Environment.java:44    : t1.start();
+      [1 insn w/o sources]
+------------------------------------------------------ transition #5 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"START" ,2/3,isCascaded:false}
+      [1 insn w/o sources]
+  harness/TestThread.java:1      : package harness;
+  harness/TestThread.java:21     : for (int i = 0; i < idx.length; i++) {
+------------------------------------------------------ transition #6 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  harness/TestThread.java:21     : for (int i = 0; i < idx.length; i++) {
+  harness/TestThread.java:22     : locks[i].lock();
+------------------------------------------------------ transition #7 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  harness/TestThread.java:22     : locks[i].lock();
+------------------------------------------------------ transition #8 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_ARRAY" ,2/3,isCascaded:false}
+  harness/TestThread.java:22     : locks[i].lock();
+------------------------------------------------------ transition #9 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"LOCK" ,2/3,isCascaded:false}
+  harness/TestThread.java:22     : locks[i].lock();
+  rtems/Mutex.java:34            : synchronized(this)
+  rtems/Mutex.java:36            : RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+      [2 insn w/o sources]
+  rtems/Mutex.java:36            : RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+  rtems/Mutex.java:37            : while((holder!=null) && (holder!=thisThread))
+------------------------------------------------------ transition #10 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:37            : while((holder!=null) && (holder!=thisThread))
+  rtems/Mutex.java:55            : assert thisThread.getState() != Thread.State.WAITING;
+      [9 insn w/o sources]
+  rtems/Mutex.java:55            : assert thisThread.getState() != Thread.State.WAITING;
+  rtems/Mutex.java:56            : if(holder==null)
+------------------------------------------------------ transition #11 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:56            : if(holder==null)
+  rtems/Mutex.java:58            : holder = thisThread;
+------------------------------------------------------ transition #12 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:58            : holder = thisThread;
+  rtems/Mutex.java:59            : holder.pushMutex(this);
+------------------------------------------------------ transition #13 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:59            : holder.pushMutex(this);
+  rtems/RTEMSThread.java:39      : assert !(mutexOrderList.contains(this));
+------------------------------------------------------ transition #14 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/RTEMSThread.java:39      : assert !(mutexOrderList.contains(this));
+      [10 insn w/o sources]
+------------------------------------------------------ transition #15 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [7 insn w/o sources]
+  rtems/RTEMSThread.java:39      : assert !(mutexOrderList.contains(this));
+  rtems/RTEMSThread.java:40      : obj.priorityBefore = currentPriority;
+------------------------------------------------------ transition #16 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/RTEMSThread.java:40      : obj.priorityBefore = currentPriority;
+------------------------------------------------------ transition #17 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/RTEMSThread.java:40      : obj.priorityBefore = currentPriority;
+  rtems/RTEMSThread.java:41      : mutexOrderList.add(0, obj);
+------------------------------------------------------ transition #18 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/RTEMSThread.java:41      : mutexOrderList.add(0, obj);
+      [6 insn w/o sources]
+------------------------------------------------------ transition #19 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [8 insn w/o sources]
+------------------------------------------------------ transition #20 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [6 insn w/o sources]
+------------------------------------------------------ transition #21 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [2 insn w/o sources]
+------------------------------------------------------ transition #22 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_CLASS" ,2/3,isCascaded:false}
+      [14 insn w/o sources]
+------------------------------------------------------ transition #23 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #24 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #25 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [9 insn w/o sources]
+------------------------------------------------------ transition #26 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [22 insn w/o sources]
+------------------------------------------------------ transition #27 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #28 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"LOCK" ,2/3,isCascaded:false}
+      [44 insn w/o sources]
+------------------------------------------------------ transition #29 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [1 insn w/o sources]
+------------------------------------------------------ transition #30 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"EXPOSE" ,2/3,isCascaded:false}
+      [6 insn w/o sources]
+------------------------------------------------------ transition #31 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #32 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [6 insn w/o sources]
+------------------------------------------------------ transition #33 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [8 insn w/o sources]
+------------------------------------------------------ transition #34 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [7 insn w/o sources]
+------------------------------------------------------ transition #35 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #36 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [2 insn w/o sources]
+  rtems/RTEMSThread.java:42      : assert wait == null;
+------------------------------------------------------ transition #37 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/RTEMSThread.java:42      : assert wait == null;
+  rtems/RTEMSThread.java:43      : assert trylock == null;
+------------------------------------------------------ transition #38 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/RTEMSThread.java:43      : assert trylock == null;
+  rtems/RTEMSThread.java:44      : }
+  rtems/Mutex.java:60            : assert nestCount==0;
+------------------------------------------------------ transition #39 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:60            : assert nestCount==0;
+  rtems/Mutex.java:62            : nestCount++;
+------------------------------------------------------ transition #40 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:62            : nestCount++;
+------------------------------------------------------ transition #41 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:62            : nestCount++;
+  rtems/Mutex.java:63            : thisThread.resourceCount++;
+------------------------------------------------------ transition #42 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:63            : thisThread.resourceCount++;
+------------------------------------------------------ transition #43 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:63            : thisThread.resourceCount++;
+  rtems/Mutex.java:64            : }
+  rtems/Mutex.java:66            : }
+  harness/TestThread.java:21     : for (int i = 0; i < idx.length; i++) {
+------------------------------------------------------ transition #44 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  harness/TestThread.java:21     : for (int i = 0; i < idx.length; i++) {
+  harness/TestThread.java:22     : locks[i].lock();
+------------------------------------------------------ transition #45 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  harness/TestThread.java:22     : locks[i].lock();
+------------------------------------------------------ transition #46 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_ARRAY" ,2/3,isCascaded:false}
+  harness/TestThread.java:22     : locks[i].lock();
+------------------------------------------------------ transition #47 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"LOCK" ,2/3,isCascaded:false}
+  harness/TestThread.java:22     : locks[i].lock();
+  rtems/Mutex.java:34            : synchronized(this)
+  rtems/Mutex.java:36            : RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+      [2 insn w/o sources]
+  rtems/Mutex.java:36            : RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+  rtems/Mutex.java:37            : while((holder!=null) && (holder!=thisThread))
+------------------------------------------------------ transition #48 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:37            : while((holder!=null) && (holder!=thisThread))
+  rtems/Mutex.java:55            : assert thisThread.getState() != Thread.State.WAITING;
+      [9 insn w/o sources]
+  rtems/Mutex.java:55            : assert thisThread.getState() != Thread.State.WAITING;
+  rtems/Mutex.java:56            : if(holder==null)
+------------------------------------------------------ transition #49 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:56            : if(holder==null)
+  rtems/Mutex.java:58            : holder = thisThread;
+------------------------------------------------------ transition #50 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:58            : holder = thisThread;
+  rtems/Mutex.java:59            : holder.pushMutex(this);
+------------------------------------------------------ transition #51 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:59            : holder.pushMutex(this);
+  rtems/RTEMSThread.java:39      : assert !(mutexOrderList.contains(this));
+------------------------------------------------------ transition #52 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/RTEMSThread.java:39      : assert !(mutexOrderList.contains(this));
+      [10 insn w/o sources]
+------------------------------------------------------ transition #53 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [5 insn w/o sources]
+------------------------------------------------------ transition #54 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [15 insn w/o sources]
+------------------------------------------------------ transition #55 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [7 insn w/o sources]
+  rtems/RTEMSThread.java:39      : assert !(mutexOrderList.contains(this));
+  rtems/RTEMSThread.java:40      : obj.priorityBefore = currentPriority;
+------------------------------------------------------ transition #56 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/RTEMSThread.java:40      : obj.priorityBefore = currentPriority;
+------------------------------------------------------ transition #57 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/RTEMSThread.java:40      : obj.priorityBefore = currentPriority;
+  rtems/RTEMSThread.java:41      : mutexOrderList.add(0, obj);
+------------------------------------------------------ transition #58 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/RTEMSThread.java:41      : mutexOrderList.add(0, obj);
+      [6 insn w/o sources]
+------------------------------------------------------ transition #59 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [8 insn w/o sources]
+------------------------------------------------------ transition #60 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [6 insn w/o sources]
+------------------------------------------------------ transition #61 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [2 insn w/o sources]
+------------------------------------------------------ transition #62 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_CLASS" ,2/3,isCascaded:false}
+      [8 insn w/o sources]
+------------------------------------------------------ transition #63 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #64 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #65 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [8 insn w/o sources]
+------------------------------------------------------ transition #66 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #67 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [6 insn w/o sources]
+------------------------------------------------------ transition #68 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [8 insn w/o sources]
+------------------------------------------------------ transition #69 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [7 insn w/o sources]
+------------------------------------------------------ transition #70 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #71 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [2 insn w/o sources]
+  rtems/RTEMSThread.java:42      : assert wait == null;
+------------------------------------------------------ transition #72 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/RTEMSThread.java:42      : assert wait == null;
+  rtems/RTEMSThread.java:43      : assert trylock == null;
+------------------------------------------------------ transition #73 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/RTEMSThread.java:43      : assert trylock == null;
+  rtems/RTEMSThread.java:44      : }
+  rtems/Mutex.java:60            : assert nestCount==0;
+------------------------------------------------------ transition #74 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:60            : assert nestCount==0;
+  rtems/Mutex.java:62            : nestCount++;
+------------------------------------------------------ transition #75 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:62            : nestCount++;
+------------------------------------------------------ transition #76 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:62            : nestCount++;
+  rtems/Mutex.java:63            : thisThread.resourceCount++;
+------------------------------------------------------ transition #77 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:63            : thisThread.resourceCount++;
+------------------------------------------------------ transition #78 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:63            : thisThread.resourceCount++;
+  rtems/Mutex.java:64            : }
+  rtems/Mutex.java:66            : }
+  harness/TestThread.java:21     : for (int i = 0; i < idx.length; i++) {
+------------------------------------------------------ transition #79 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  harness/TestThread.java:21     : for (int i = 0; i < idx.length; i++) {
+  harness/TestThread.java:24     : for (int i = idx.length-1; i>= 0; i--) {
+------------------------------------------------------ transition #80 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  harness/TestThread.java:24     : for (int i = idx.length-1; i>= 0; i--) {
+  harness/TestThread.java:25     : locks[i].unlock();
+------------------------------------------------------ transition #81 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  harness/TestThread.java:25     : locks[i].unlock();
+------------------------------------------------------ transition #82 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_ARRAY" ,2/3,isCascaded:false}
+  harness/TestThread.java:25     : locks[i].unlock();
+------------------------------------------------------ transition #83 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"LOCK" ,2/3,isCascaded:false}
+  harness/TestThread.java:25     : locks[i].unlock();
+  rtems/Mutex.java:69            : Mutex topMutex=null;
+  rtems/Mutex.java:70            : RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+      [2 insn w/o sources]
+  rtems/Mutex.java:70            : RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+  rtems/Mutex.java:73            : assert nestCount>0;
+------------------------------------------------------ transition #84 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:73            : assert nestCount>0;
+  rtems/Mutex.java:74            : assert thisThread.resourceCount>0;
+------------------------------------------------------ transition #85 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:74            : assert thisThread.resourceCount>0;
+  rtems/Mutex.java:75            : synchronized(this)
+  rtems/Mutex.java:78            : nestCount--;
+------------------------------------------------------ transition #86 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:78            : nestCount--;
+------------------------------------------------------ transition #87 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:78            : nestCount--;
+  rtems/Mutex.java:79            : thisThread.resourceCount--;
+------------------------------------------------------ transition #88 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:79            : thisThread.resourceCount--;
+------------------------------------------------------ transition #89 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:79            : thisThread.resourceCount--;
+  rtems/Mutex.java:80            : if(nestCount==0)
+------------------------------------------------------ transition #90 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:80            : if(nestCount==0)
+  rtems/Mutex.java:82            : topMutex = thisThread.mutexOrderList.get(0);
+------------------------------------------------------ transition #91 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:82            : topMutex = thisThread.mutexOrderList.get(0);
+      [6 insn w/o sources]
+------------------------------------------------------ transition #92 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [8 insn w/o sources]
+------------------------------------------------------ transition #93 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [5 insn w/o sources]
+  rtems/Mutex.java:82            : topMutex = thisThread.mutexOrderList.get(0);
+  rtems/Mutex.java:83            : assert this==topMutex;
+  rtems/Mutex.java:84            : topMutex = thisThread.mutexOrderList.remove(0);
+------------------------------------------------------ transition #94 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:84            : topMutex = thisThread.mutexOrderList.remove(0);
+      [6 insn w/o sources]
+------------------------------------------------------ transition #95 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [6 insn w/o sources]
+------------------------------------------------------ transition #96 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #97 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [6 insn w/o sources]
+------------------------------------------------------ transition #98 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [7 insn w/o sources]
+------------------------------------------------------ transition #99 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [10 insn w/o sources]
+------------------------------------------------------ transition #100 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [6 insn w/o sources]
+------------------------------------------------------ transition #101 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [8 insn w/o sources]
+------------------------------------------------------ transition #102 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #103 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [5 insn w/o sources]
+------------------------------------------------------ transition #104 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [5 insn w/o sources]
+  rtems/Mutex.java:84            : topMutex = thisThread.mutexOrderList.remove(0);
+  rtems/Mutex.java:85            : synchronized(thisThread){
+------------------------------------------------------ transition #105 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"LOCK" ,3/3,isCascaded:false}
+      [1 insn w/o sources]
+  harness/TestThread.java:1      : package harness;
+  harness/TestThread.java:21     : for (int i = 0; i < idx.length; i++) {
+------------------------------------------------------ transition #106 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  harness/TestThread.java:21     : for (int i = 0; i < idx.length; i++) {
+  harness/TestThread.java:22     : locks[i].lock();
+------------------------------------------------------ transition #107 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  harness/TestThread.java:22     : locks[i].lock();
+------------------------------------------------------ transition #108 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_ARRAY" ,3/3,isCascaded:false}
+  harness/TestThread.java:22     : locks[i].lock();
+------------------------------------------------------ transition #109 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"LOCK" ,3/3,isCascaded:false}
+  harness/TestThread.java:22     : locks[i].lock();
+  rtems/Mutex.java:34            : synchronized(this)
+  rtems/Mutex.java:36            : RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+      [2 insn w/o sources]
+  rtems/Mutex.java:36            : RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+  rtems/Mutex.java:37            : while((holder!=null) && (holder!=thisThread))
+------------------------------------------------------ transition #110 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:37            : while((holder!=null) && (holder!=thisThread))
+------------------------------------------------------ transition #111 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:37            : while((holder!=null) && (holder!=thisThread))
+  rtems/Mutex.java:39            : assert (thisThread.currentPriority == thisThread.getPriority());
+------------------------------------------------------ transition #112 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:39            : assert (thisThread.currentPriority == thisThread.getPriority());
+      [3 insn w/o sources]
+  rtems/Mutex.java:39            : assert (thisThread.currentPriority == thisThread.getPriority());
+  rtems/Mutex.java:41            : thisThread.state = Thread.State.WAITING;
+------------------------------------------------------ transition #113 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:41            : thisThread.state = Thread.State.WAITING;
+  rtems/Mutex.java:42            : updatePriority(thisThread.currentPriority);
+------------------------------------------------------ transition #114 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:42            : updatePriority(thisThread.currentPriority);
+  rtems/Mutex.java:141           : if(USE_MODEL==REC_UPDATE)
+------------------------------------------------------ transition #115 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_CLASS" ,3/3,isCascaded:false}
+  rtems/Mutex.java:141           : if(USE_MODEL==REC_UPDATE)
+  rtems/Mutex.java:143           : updateRecPriority(priority);
+  rtems/Mutex.java:175           : RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+      [2 insn w/o sources]
+  rtems/Mutex.java:175           : RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+  rtems/Mutex.java:176           : int mutexIdx = this.holder.getMutexIndex(this);
+------------------------------------------------------ transition #116 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:176           : int mutexIdx = this.holder.getMutexIndex(this);
+  rtems/RTEMSThread.java:35      : return mutexOrderList.indexOf(obj);
+------------------------------------------------------ transition #117 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/RTEMSThread.java:35      : return mutexOrderList.indexOf(obj);
+      [7 insn w/o sources]
+------------------------------------------------------ transition #118 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+      [5 insn w/o sources]
+------------------------------------------------------ transition #119 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+      [3 insn w/o sources]
+------------------------------------------------------ transition #120 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_ARRAY" ,3/3,isCascaded:false}
+      [11 insn w/o sources]
+  rtems/RTEMSThread.java:35      : return mutexOrderList.indexOf(obj);
+  rtems/Mutex.java:176           : int mutexIdx = this.holder.getMutexIndex(this);
+  rtems/Mutex.java:177           : int stopflag = 0;
+  rtems/Mutex.java:178           : assert this.holder!=null;
+------------------------------------------------------ transition #121 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:178           : assert this.holder!=null;
+  rtems/Mutex.java:179           : assert this.holder!= thisThread;
+------------------------------------------------------ transition #122 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:179           : assert this.holder!= thisThread;
+  rtems/Mutex.java:181           : assert mutexIdx!=-1;
+  rtems/Mutex.java:182           : for(i=mutexIdx-1;i>=0;i--)
+  rtems/Mutex.java:192           : if(stopflag==0)
+  rtems/Mutex.java:194           : synchronized(holder)
+------------------------------------------------------ transition #123 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:194           : synchronized(holder)
+------------------------------------------------------ transition #124 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"LOCK" ,3/3,isCascaded:false}
+  rtems/Mutex.java:194           : synchronized(holder)
+  rtems/Mutex.java:196           : if(holder.currentPriority > priority)
+------------------------------------------------------ transition #125 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/2,isCascaded:false}
+  rtems/Mutex.java:196           : if(holder.currentPriority > priority)
+------------------------------------------------------ transition #126 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/2,isCascaded:false}
+  rtems/Mutex.java:196           : if(holder.currentPriority > priority)
+  rtems/Mutex.java:198           : holder.currentPriority = priority;
+------------------------------------------------------ transition #127 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/2,isCascaded:false}
+  rtems/Mutex.java:198           : holder.currentPriority = priority;
+------------------------------------------------------ transition #128 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/2,isCascaded:false}
+  rtems/Mutex.java:198           : holder.currentPriority = priority;
+  rtems/Mutex.java:199           : holder.setPriority(priority);
+------------------------------------------------------ transition #129 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/2,isCascaded:false}
+  rtems/Mutex.java:199           : holder.setPriority(priority);
+      [13 insn w/o sources]
+------------------------------------------------------ transition #130 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"PRIORITY" ,2/2,isCascaded:false}
+      [3 insn w/o sources]
+  rtems/Mutex.java:201           : }
+------------------------------------------------------ transition #131 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"RELEASE" ,2/3,isCascaded:false}
+  rtems/Mutex.java:85            : synchronized(thisThread){
+  rtems/Mutex.java:86            : thisThread.setPriority(priorityBefore);
+------------------------------------------------------ transition #132 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:86            : thisThread.setPriority(priorityBefore);
+      [13 insn w/o sources]
+------------------------------------------------------ transition #133 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"PRIORITY" ,2/3,isCascaded:false}
+      [3 insn w/o sources]
+  rtems/Mutex.java:87            : thisThread.currentPriority = priorityBefore;
+------------------------------------------------------ transition #134 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:87            : thisThread.currentPriority = priorityBefore;
+------------------------------------------------------ transition #135 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:87            : thisThread.currentPriority = priorityBefore;
+  rtems/Mutex.java:88            : }
+  rtems/Mutex.java:90            : validator();
+  rtems/Mutex.java:116           : RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+      [2 insn w/o sources]
+  rtems/Mutex.java:116           : RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+  rtems/Mutex.java:117           : Iterator<Mutex> mItr = thisThread.mutexOrderList.iterator();
+------------------------------------------------------ transition #136 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:117           : Iterator<Mutex> mItr = thisThread.mutexOrderList.iterator();
+      [25 insn w/o sources]
+  rtems/Mutex.java:117           : Iterator<Mutex> mItr = thisThread.mutexOrderList.iterator();
+  rtems/Mutex.java:118           : while (mItr.hasNext()){
+      [7 insn w/o sources]
+------------------------------------------------------ transition #137 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [6 insn w/o sources]
+  rtems/Mutex.java:118           : while (mItr.hasNext()){
+  rtems/Mutex.java:119           : chkMtx = mItr.next();
+      [5 insn w/o sources]
+------------------------------------------------------ transition #138 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [14 insn w/o sources]
+------------------------------------------------------ transition #139 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [6 insn w/o sources]
+------------------------------------------------------ transition #140 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [17 insn w/o sources]
+------------------------------------------------------ transition #141 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_ARRAY" ,2/3,isCascaded:false}
+      [2 insn w/o sources]
+  rtems/Mutex.java:119           : chkMtx = mItr.next();
+  rtems/Mutex.java:120           : System.out.println("--->Mutex: "+chkMtx.id);
+      [2 insn w/o sources]
+  rtems/Mutex.java:120           : System.out.println("--->Mutex: "+chkMtx.id);
+      [2 insn w/o sources]
+  rtems/Mutex.java:120           : System.out.println("--->Mutex: "+chkMtx.id);
+------------------------------------------------------ transition #142 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:120           : System.out.println("--->Mutex: "+chkMtx.id);
+      [2 insn w/o sources]
+  rtems/Mutex.java:120           : System.out.println("--->Mutex: "+chkMtx.id);
+      [2 insn w/o sources]
+  rtems/Mutex.java:120           : System.out.println("--->Mutex: "+chkMtx.id);
+      [2 insn w/o sources]
+  rtems/Mutex.java:121           : chkThr = chkMtx.waitQueue.peek();
+------------------------------------------------------ transition #143 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+  rtems/Mutex.java:121           : chkThr = chkMtx.waitQueue.peek();
+      [2 insn w/o sources]
+------------------------------------------------------ transition #144 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:201           : }
+  rtems/Mutex.java:207           : }
+  rtems/Mutex.java:143           : updateRecPriority(priority);
+  rtems/Mutex.java:149           : if(holder.wait!=null){
+------------------------------------------------------ transition #145 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:149           : if(holder.wait!=null){
+------------------------------------------------------ transition #146 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:149           : if(holder.wait!=null){
+  rtems/Mutex.java:160           : }
+  rtems/Mutex.java:43            : if(waitQueue.contains(thisThread)==false){
+------------------------------------------------------ transition #147 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:43            : if(waitQueue.contains(thisThread)==false){
+      [10 insn w/o sources]
+------------------------------------------------------ transition #148 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+      [8 insn w/o sources]
+  rtems/Mutex.java:43            : if(waitQueue.contains(thisThread)==false){
+  rtems/Mutex.java:44            : System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+      [2 insn w/o sources]
+  rtems/Mutex.java:44            : System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+      [2 insn w/o sources]
+  rtems/Mutex.java:44            : System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+      [2 insn w/o sources]
+  rtems/Mutex.java:44            : System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+      [2 insn w/o sources]
+  rtems/Mutex.java:44            : System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+      [2 insn w/o sources]
+  rtems/Mutex.java:44            : System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+------------------------------------------------------ transition #149 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:44            : System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+      [2 insn w/o sources]
+  rtems/Mutex.java:44            : System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+      [2 insn w/o sources]
+  rtems/Mutex.java:44            : System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+      [2 insn w/o sources]
+  rtems/Mutex.java:45            : waitQueue.offer(thisThread);
+------------------------------------------------------ transition #150 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+  rtems/Mutex.java:45            : waitQueue.offer(thisThread);
+      [5 insn w/o sources]
+------------------------------------------------------ transition #151 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #152 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+      [3 insn w/o sources]
+------------------------------------------------------ transition #153 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+      [5 insn w/o sources]
+------------------------------------------------------ transition #154 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+      [8 insn w/o sources]
+------------------------------------------------------ transition #155 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,3/3,isCascaded:false}
+      [5 insn w/o sources]
+------------------------------------------------------ transition #156 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #157 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [3 insn w/o sources]
+------------------------------------------------------ transition #158 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_ARRAY" ,3/3,isCascaded:false}
+      [4 insn w/o sources]
+------------------------------------------------------ transition #159 thread: 2
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_ARRAY" ,3/3,isCascaded:false}
+      [4 insn w/o sources]
+  rtems/Mutex.java:45            : waitQueue.offer(thisThread);
+  rtems/Mutex.java:47            : thisThread.wait = waitQueue;
+------------------------------------------------------ transition #160 thread: 1
+gov.nasa.jpf.vm.choice.ThreadChoiceFromSet {id:"SHARED_OBJECT" ,2/3,isCascaded:false}
+      [2 insn w/o sources]
+  rtems/Mutex.java:121           : chkThr = chkMtx.waitQueue.peek();
+  rtems/Mutex.java:122           : if(chkThr!=null)
+  rtems/Mutex.java:124           : System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
+      [2 insn w/o sources]
+  rtems/Mutex.java:124           : System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
+      [2 insn w/o sources]
+  rtems/Mutex.java:124           : System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
+      [2 insn w/o sources]
+  rtems/Mutex.java:124           : System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
+      [2 insn w/o sources]
+  rtems/Mutex.java:124           : System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
+      [2 insn w/o sources]
+  rtems/Mutex.java:124           : System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
+      [3 insn w/o sources]
+  rtems/Mutex.java:124           : System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
+      [2 insn w/o sources]
+  rtems/Mutex.java:124           : System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
+      [2 insn w/o sources]
+  rtems/Mutex.java:124           : System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
+      [2 insn w/o sources]
+  rtems/Mutex.java:125           : assert (thisThread.getPriority()<=chkThr.getPriority());
+      [3 insn w/o sources]
+  rtems/Mutex.java:125           : assert (thisThread.getPriority()<=chkThr.getPriority());
+      [3 insn w/o sources]
+  rtems/Mutex.java:125           : assert (thisThread.getPriority()<=chkThr.getPriority());
+      [21 insn w/o sources]
+  rtems/Mutex.java:125           : assert (thisThread.getPriority()<=chkThr.getPriority());
+  rtems/Mutex.java:104           : }
+
+====================================================== snapshot #1
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at java.lang.Thread.start(Thread.java)
+	at harness.Environment.main(Environment.java:44)
+
+thread harness.TestThread:{id:1,name:Thread-1,status:RUNNING,priority:3,isDaemon:false,lockCount:0,suspendCount:0}
+  owned locks:rtems.Mutex@181
+  call stack:
+	at rtems.Mutex.unlock(Mutex.java:104)
+	at harness.TestThread.run(TestThread.java:25)
+
+thread harness.TestThread:{id:2,name:Thread-2,status:RUNNING,priority:2,isDaemon:false,lockCount:0,suspendCount:0}
+  owned locks:rtems.Mutex@165
+  call stack:
+	at rtems.Mutex.lock(Mutex.java:47)
+	at harness.TestThread.run(TestThread.java:22)
+
+
+====================================================== results
+error #1: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.AssertionError  at rtems.Mutex.validator..."
+
+====================================================== statistics
+elapsed time:       00:00:02
+states:             new=2336,visited=3926,backtracked=6101,end=2254
+search:             maxDepth=308,constraints=0
+choice generators:  thread=2259 (signal=40,lock=121,sharedRef=1891,threadApi=28,reschedule=179), data=0
+heap:               new=1536,released=6143,maxLive=461,gcCycles=6192
+instructions:       45516
+max memory:         102MB
+loaded code:        classes=80,methods=1817
+
+====================================================== search finished: 7/14/15 11:09 PM
+]0;saurabh@saurabh-Inspiron-N5010: ~/model_checking/new2-lockmodel/lock-modelsaurabh@saurabh-Inspiron-N5010:~/model_checking/new2-lockmodel/lock-model$ exit
+exit
+
+Script done on Tue 14 Jul 2015 11:09:55 PM PDT

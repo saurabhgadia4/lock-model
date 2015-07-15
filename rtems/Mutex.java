@@ -31,56 +31,38 @@ public class Mutex extends Lock {
 	}
 
 	public synchronized void lock() {
-		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-		while((holder!=null) && (holder!=thisThread))
+		synchronized(this)
 		{
-			assert (thisThread.currentPriority == thisThread.getPriority());
-			try{
-				thisThread.state = Thread.State.WAITING;
-				/*if(priorityRaiseFilter(thisThread.currentPriority))
-				{
-					System.out.println("raising priority of thread: "+ holder.getId() + "by thread : " + thisThread.getId()+" frm :"+holder.currentPriority + " to: "+ thisThread.currentPriority);
+			RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+			while((holder!=null) && (holder!=thisThread))
+			{
+				assert (thisThread.currentPriority == thisThread.getPriority());
+				try{
+					thisThread.state = Thread.State.WAITING;
 					updatePriority(thisThread.currentPriority);
-					System.out.println("updated pr for tid: "+holder.getId() +" current pr: "+holder.currentPriority);
-					
-				}*/
-				/* above is commented because we need to address indirect reference problem. In all cases
-				   we should recursively update priority and should not compare with current priority. for ex.
-				   thread 1 has mutex 0, 1, 2--->running. It acquired all mutex at priority=3. Now thread 3 of 
-				   priority=1 tries to acquire mutex 2. Thus thread 1 priority now promoted to 1. After it will
-				   release mutex 2 its priority will be reset to 3 again. Now lets say thread 2 of priority 2 tries to acquire 
-				   mutex 0, now according to priorityRaiseFilter we will see that thread 1 is at priority 1 and
-				   so no promotion required. But when thread 1 will release mutex 2 its priority will be reset to 3
-				   and it still has mutex (0, 1) and on mutex 0 thread 2 with priorty =2 is still waiting. 
-				   So it violation and we need to address this problem. 
-
-				*/
-				updatePriority(thisThread.currentPriority);
-				if(waitQueue.contains(thisThread)==false){
-					System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
-					waitQueue.offer(thisThread);
-				}
-				thisThread.wait = waitQueue;
-				thisThread.trylock = this;
-				wait();
-						
-				}catch (InterruptedException e) 
-				{}
-			
+					if(waitQueue.contains(thisThread)==false){
+						System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+						waitQueue.offer(thisThread);
+					}
+					thisThread.wait = waitQueue;
+					thisThread.trylock = this;
+					wait();
+							
+					}catch (InterruptedException e) 
+					{}
+				
+			}
+			assert thisThread.getState() != Thread.State.WAITING;
+			if(holder==null)
+			{
+				holder = thisThread;
+				holder.pushMutex(this);
+				assert nestCount==0;
+			}
+			nestCount++;
+			thisThread.resourceCount++;
 		}
-		//if code reaches here it means it has the potential to acquire the mutex
-		System.out.println("thread-id:"+ thisThread.getId() + " acquiring mutex "+ id);
-		assert thisThread.getState() != Thread.State.WAITING;
-		if(holder==null)
-		{
-			//System.out.println("thread: "+thisThread.getId() + "adding mutex: "+ id + " to its mutexOrderList");
-			holder = thisThread;
-			holder.pushMutex(this);
-			assert nestCount==0;
-		}
-		nestCount++;
-		thisThread.resourceCount++;
-	
+		
 	}
 
 	public synchronized void unlock() {
@@ -90,35 +72,37 @@ public class Mutex extends Lock {
 		int stepdownPri;
 		assert nestCount>0;
 		assert thisThread.resourceCount>0;
-		nestCount--;
-		thisThread.resourceCount--;
-		if(nestCount==0)
+		synchronized(this)
 		{
-			topMutex = thisThread.mutexOrderList.get(0);
-			assert this==topMutex;		
-			topMutex = thisThread.mutexOrderList.remove(0);
-		//<---------------------------------------------------------------Thread 1 crosses this-------------->
 
-			//System.out.println("Holder Thread: "+thisThread.getId()+"before resetting priority_before : "+ thisThread.getPriority()+" while releasing mutex: " + id);
-			thisThread.setPriority(priorityBefore);
-			thisThread.currentPriority = priorityBefore;
-			System.out.println("Holder Thread: "+thisThread.getId()+ " after stepdown ops-->current priority: " + thisThread.getPriority() + " while releasing mutex: " + id);
-			validator();
-			assert holder!=null;
-			assert holder.wait==null;
-			assert holder.trylock==null;
-		//<--------------------------------------------But Thread 1 does not crosses this----------------------->	
-			holder = waitQueue.poll();			
-			if(holder != null){
-				assert holder.state==Thread.State.WAITING;
-				holder.state = Thread.State.RUNNABLE;
-				holder.wait = null;
-				holder.trylock = null;
-				// We need to push this mutex entry in mutexOrderList of new holder.(Bug test_2_0)
-				holder.pushMutex(this);
-				notifyAll();
-			}
-		}			
+			nestCount--;
+			thisThread.resourceCount--;
+			if(nestCount==0)
+			{
+				topMutex = thisThread.mutexOrderList.get(0);
+				assert this==topMutex;		
+				topMutex = thisThread.mutexOrderList.remove(0);
+				synchronized(thisThread){
+					thisThread.setPriority(priorityBefore);
+					thisThread.currentPriority = priorityBefore;	
+				}
+				
+				validator();
+				assert holder!=null;
+				assert holder.wait==null;
+				assert holder.trylock==null;
+				holder = waitQueue.poll();			
+				if(holder != null){
+					assert holder.state==Thread.State.WAITING;
+					holder.state = Thread.State.RUNNABLE;
+					holder.wait = null;
+					holder.trylock = null;
+					holder.pushMutex(this);
+					notifyAll();
+				}
+			}	
+		}
+					
 	}
 
 /*
@@ -202,40 +186,33 @@ there should be no higher priority thread contending on any of the mutex still h
 				stopflag = 1;
 				break;
 			}
-			candidate.priorityBefore = priority;
+			candidate.priorityBefore = priority;	
+			
 		}
-		if(stopflag==0){
-			/*
-				this check is added because we don't need to change priority
-			*/
-			if(holder.currentPriority > priority)
+		if(stopflag==0)
+		{
+			synchronized(holder)
 			{
-				holder.currentPriority = priority;
-				holder.setPriority(priority);	
+				if(holder.currentPriority > priority)
+				{
+					holder.currentPriority = priority;
+					holder.setPriority(priority);	
+				}	
 			}
+			
 				
 		}
 		
-
-		/* need to include fix for spsem03 test case of indirect reference */
 	
 	}
 	
 	public void reEnqueue()
 	{
-		//if holder thread is waiting on someother mutex reenqueue that thread with updated priority.
 		PriorityQueue<RTEMSThread> pqueue;
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-		//System.out.println("thread: "+holder.getId()+" being re-enqued by thread: " + thisThread.getId());
 		pqueue = holder.wait;
 		pqueue.remove(holder);
 		pqueue.offer(holder);
-    //<--------- Nice bug uncovered!! and coincidently matches with spsem03----------------->
-	/* thread 2 raised priority of thread 1 from 3 to 1. Thread 1 was already waiting in queue for mutex 2 hold
-	by thread 3 whose priority is 2. So again we got unbounded priority inheritance problem. We should now  for 
-	correct behavior should raise thread 3 priority for avoiding UPI"*/
-		
-
 	}
 }
 
