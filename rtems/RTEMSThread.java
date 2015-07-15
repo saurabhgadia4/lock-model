@@ -15,7 +15,7 @@ public class RTEMSThread extends Thread {
 	public Mutex trylock;
 
 	public RTEMSThread(int priority) {
-		this.mutexOrderList = /*Collections.synchronizedList(*/new ArrayList<Mutex>()/*)*/;
+		this.mutexOrderList = new ArrayList<Mutex>();
 		this.state = this.getState();
 		this.setPriority(priority);
 		this.currentPriority = this.realPriority = this.getPriority();

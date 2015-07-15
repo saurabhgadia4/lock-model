@@ -79,28 +79,28 @@ public class Mutex extends Lock {
 			thisThread.resourceCount--;
 			if(nestCount==0)
 			{
-				topMutex = thisThread.mutexOrderList.get(0);
-				assert this==topMutex;		
-				topMutex = thisThread.mutexOrderList.remove(0);
 				synchronized(thisThread){
-					thisThread.setPriority(priorityBefore);
-					thisThread.currentPriority = priorityBefore;	
-				}
+					topMutex = thisThread.mutexOrderList.get(0);
+					assert this==topMutex;		
+					topMutex = thisThread.mutexOrderList.remove(0);
+						thisThread.setPriority(priorityBefore);
+						thisThread.currentPriority = priorityBefore;	
 				
-				validator();
-				assert holder!=null;
-				assert holder.wait==null;
-				assert holder.trylock==null;
-				holder = waitQueue.poll();			
-				if(holder != null){
-					assert holder.state==Thread.State.WAITING;
-					holder.state = Thread.State.RUNNABLE;
-					holder.wait = null;
-					holder.trylock = null;
-					holder.pushMutex(this);
-					notifyAll();
+					validator();
+					assert holder!=null;
+					assert holder.wait==null;
+					assert holder.trylock==null;
+					holder = waitQueue.poll();			
+					if(holder != null){
+						assert holder.state==Thread.State.WAITING;
+						holder.state = Thread.State.RUNNABLE;
+						holder.wait = null;
+						holder.trylock = null;
+						holder.pushMutex(this);
+					}
 				}
-			}	
+			notifyAll();
+			}
 		}
 					
 	}
@@ -114,15 +114,17 @@ there should be no higher priority thread contending on any of the mutex still h
 		RTEMSThread chkThr;
 		Mutex chkMtx;
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-		Iterator<Mutex> mItr = thisThread.mutexOrderList.iterator();
-		while (mItr.hasNext()){
-			chkMtx = mItr.next();
-			System.out.println("--->Mutex: "+chkMtx.id);
-			chkThr = chkMtx.waitQueue.peek();
-			if(chkThr!=null)
-			{
-				System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
-				assert (thisThread.getPriority()<=chkThr.getPriority());	
+		synchronized(thisThread) {
+			Iterator<Mutex> mItr = thisThread.mutexOrderList.iterator();
+			while (mItr.hasNext()){
+				chkMtx = mItr.next();
+				System.out.println("--->Mutex: "+chkMtx.id);
+				chkThr = chkMtx.waitQueue.peek();
+				if(chkThr!=null)
+				{
+					System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
+					assert (thisThread.getPriority()<=chkThr.getPriority());	
+				}
 			}
 			
 		}
@@ -138,21 +140,23 @@ there should be no higher priority thread contending on any of the mutex still h
 	{
 		RTEMSThread parentThread;
 
-		if(USE_MODEL==REC_UPDATE)
-		{
-			updateRecPriority(priority);
-		}
-		else
-		{
-			updateNonRecPriority(priority);
-		}
-		if(holder.wait!=null){
-			assert holder.trylock!=null;
-			reEnqueue();
-			parentThread = holder.trylock.holder;
-			if(parentThread.currentPriority > holder.currentPriority)
+		synchronized(holder) {
+			if(USE_MODEL==REC_UPDATE)
 			{
-				holder.trylock.updatePriority(holder.currentPriority);
+				updateRecPriority(priority);
+			}
+			else
+			{
+				updateNonRecPriority(priority);
+			}
+			if(holder.wait!=null){
+				assert holder.trylock!=null;
+				reEnqueue();
+				parentThread = holder.trylock.holder;
+				if(parentThread.currentPriority > holder.currentPriority)
+				{
+					holder.trylock.updatePriority(holder.currentPriority);
+				}
 			}
 
 		}
@@ -191,15 +195,11 @@ there should be no higher priority thread contending on any of the mutex still h
 		}
 		if(stopflag==0)
 		{
-			synchronized(holder)
+			if(holder.currentPriority > priority)
 			{
-				if(holder.currentPriority > priority)
-				{
-					holder.currentPriority = priority;
-					holder.setPriority(priority);	
-				}	
-			}
-			
+				holder.currentPriority = priority;
+				holder.setPriority(priority);	
+			}	
 				
 		}
 		
