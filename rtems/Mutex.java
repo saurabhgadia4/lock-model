@@ -35,21 +35,31 @@ public class Mutex extends Lock {
 		synchronized(this.mutexLock)
 		{
 			RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+
 			while((holder!=null) && (holder!=thisThread))
 			{
-				assert (thisThread.currentPriority == thisThread.getPriority());
-				try{
-					thisThread.state = Thread.State.WAITING;
-					updatePriority(thisThread.currentPriority);
-					if(waitQueue.contains(thisThread)==false){
-						System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
-						waitQueue.offer(thisThread);
-					}
-					thisThread.wait = waitQueue;
-					thisThread.trylock = this;
-					wait();
-							
-					}catch (InterruptedException e) 
+					
+					try{
+						synchronized(thisThread.rtemsThreadLock)
+						{
+							synchronized(holder.rtemsThreadLock)
+							{
+
+
+								assert (thisThread.currentPriority == thisThread.getPriority());
+								thisThread.state = Thread.State.WAITING;
+								updatePriority(thisThread.currentPriority);
+								if(waitQueue.contains(thisThread)==false){
+									System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+									waitQueue.offer(thisThread);
+								}
+								thisThread.wait = waitQueue;
+								thisThread.trylock = this;
+							}
+						}
+						wait();
+								
+						}catch (InterruptedException e) 
 					{}
 				
 			}
@@ -90,9 +100,8 @@ public class Mutex extends Lock {
 						topMutex = thisThread.mutexOrderList.remove(0);
 						thisThread.setPriority(priorityBefore);
 						thisThread.currentPriority = priorityBefore;	
+						validator();
 					}
-				
-					validator();
 					assert holder!=null;
 					assert holder.wait==null;
 					assert holder.trylock==null;
@@ -105,7 +114,7 @@ public class Mutex extends Lock {
 					holder.trylock = null;
 					holder.pushMutex(this);
 					notifyAll();
-						}
+				}
 			
 			}
 		}
@@ -154,7 +163,6 @@ there should be no higher priority thread contending on any of the mutex still h
 			{
 				updateNonRecPriority(priority);
 			}
-
 			if(holder.wait!=null){
 				assert holder.trylock!=null;
 				reEnqueue();
@@ -181,30 +189,35 @@ there should be no higher priority thread contending on any of the mutex still h
 		int i;
 		Mutex candidate;
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-		int mutexIdx = this.holder.getMutexIndex(this);
-		int stopflag = 0;
-		assert this.holder!=null;	
-		assert this.holder!= thisThread;	
-		//Assertion check
-		assert mutexIdx!=-1;
-		for(i=mutexIdx-1;i>=0;i--)
+		synchronized(holder.rtemsThreadLock)
 		{
-			candidate = holder.mutexOrderList.get(i);
-			if(candidate.priorityBefore < priority){
-				stopflag = 1;
-				break;
-			}
-			candidate.priorityBefore = priority;	
-			
-		}
-		if(stopflag==0)
-		{
-			if(holder.currentPriority > priority)
+
+
+			int mutexIdx = this.holder.getMutexIndex(this);
+			int stopflag = 0;
+			assert this.holder!=null;	
+			assert this.holder!= thisThread;	
+			//Assertion check
+			assert mutexIdx!=-1;
+			for(i=mutexIdx-1;i>=0;i--)
 			{
-				holder.currentPriority = priority;
-				holder.setPriority(priority);	
-			}	
+				candidate = holder.mutexOrderList.get(i);
+				if(candidate.priorityBefore < priority){
+					stopflag = 1;
+					break;
+				}
+				candidate.priorityBefore = priority;	
 				
+			}
+			if(stopflag==0)
+			{
+				if(holder.currentPriority > priority)
+				{
+					holder.currentPriority = priority;
+					holder.setPriority(priority);	
+				}	
+					
+			}
 		}
 		
 	
