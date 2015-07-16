@@ -12,7 +12,6 @@ public class Mutex extends Lock {
 	int priorityBefore=-1;
 	MyComparator comparator = new MyComparator();
 	PriorityQueue<RTEMSThread> waitQueue = new PriorityQueue<RTEMSThread>(7, comparator);
-	public Object mutexLock = new Object();
 	public static final int REC_UPDATE = 1;
   	public static final int NONREC_UPDATE = 0;
 	public static int USE_MODEL=NONREC_UPDATE;
@@ -32,17 +31,15 @@ public class Mutex extends Lock {
 	}
 
 	public synchronized void lock() {
-		synchronized(this.mutexLock)
-		{
 			RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 
 			while((holder!=null) && (holder!=thisThread))
 			{
 					
 					try{
-						synchronized(thisThread.rtemsThreadLock)
+						synchronized(thisThread)
 						{
-							synchronized(holder.rtemsThreadLock)
+							synchronized(holder)
 							{
 
 
@@ -66,7 +63,7 @@ public class Mutex extends Lock {
 			assert thisThread.getState() != Thread.State.WAITING;
 			if(holder==null)
 			{
-				synchronized(thisThread.rtemsThreadLock)
+				synchronized(thisThread)
 				{
 					holder = thisThread;
 					holder.pushMutex(this);
@@ -75,7 +72,6 @@ public class Mutex extends Lock {
 			}
 			nestCount++;
 			thisThread.resourceCount++;
-		}
 		
 	}
 
@@ -86,14 +82,11 @@ public class Mutex extends Lock {
 		int stepdownPri;
 		assert nestCount>0;
 		assert thisThread.resourceCount>0;
-		synchronized(this.mutexLock)
-		{
-
 			nestCount--;
 			thisThread.resourceCount--;
 			if(nestCount==0)
 			{
-					synchronized(thisThread.rtemsThreadLock)
+					synchronized(thisThread)
 					{
 						topMutex = thisThread.mutexOrderList.get(0);
 						assert this==topMutex;		
@@ -101,12 +94,13 @@ public class Mutex extends Lock {
 						thisThread.setPriority(priorityBefore);
 						thisThread.currentPriority = priorityBefore;	
 						validator();
-					}
-					assert holder!=null;
-					assert holder.wait==null;
-					assert holder.trylock==null;
+					
+						assert holder!=null;
+						assert holder.wait==null;
+						assert holder.trylock==null;
 				
-					holder = waitQueue.poll();			
+						holder = waitQueue.poll();			
+					}
 					if(holder != null){
 					assert holder.state==Thread.State.WAITING;
 					holder.state = Thread.State.RUNNABLE;
@@ -117,7 +111,6 @@ public class Mutex extends Lock {
 				}
 			
 			}
-		}
 					
 	}
 
@@ -144,16 +137,16 @@ there should be no higher priority thread contending on any of the mutex still h
 
 	}
 
-	public boolean priorityRaiseFilter(int priority){
+	public synchronized boolean priorityRaiseFilter(int priority){
 		int holderPriority = holder.getPriority();
 		return (priority < holderPriority);
 	}
 
-	public void updatePriority(int priority)
+	public synchronized void updatePriority(int priority)
 	{
 		RTEMSThread parentThread;
 
-		synchronized(holder.rtemsThreadLock)
+		synchronized(holder)
 		{
 			if(USE_MODEL==REC_UPDATE)
 			{
@@ -184,14 +177,13 @@ there should be no higher priority thread contending on any of the mutex still h
 
 	}
 
-	public void updateRecPriority(int priority)
+	public synchronized void updateRecPriority(int priority)
 	{
 		int i;
 		Mutex candidate;
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-		synchronized(holder.rtemsThreadLock)
+		synchronized(holder)
 		{
-
 
 			int mutexIdx = this.holder.getMutexIndex(this);
 			int stopflag = 0;
@@ -218,12 +210,10 @@ there should be no higher priority thread contending on any of the mutex still h
 				}	
 					
 			}
-		}
-		
-	
+		}		
 	}
 	
-	public void reEnqueue()
+	public synchronized void reEnqueue()
 	{
 		PriorityQueue<RTEMSThread> pqueue;
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();

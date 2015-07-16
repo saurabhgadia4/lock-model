@@ -13,7 +13,6 @@ public class RTEMSThread extends Thread {
 	public int realPriority;
 	public List<Mutex> mutexOrderList;  //it is a linkedList which stores acquired mutex objects in LIFO order.
 	public Mutex trylock;
-	public Object rtemsThreadLock = new Object();
 
 	public RTEMSThread(int priority) {
 		this.mutexOrderList = new ArrayList<Mutex>();
