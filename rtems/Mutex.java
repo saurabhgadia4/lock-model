@@ -97,9 +97,10 @@ public class Mutex extends Lock {
 						holder.wait = null;
 						holder.trylock = null;
 						holder.pushMutex(this);
+						notifyAll();
 					}
 				}
-			notifyAll();
+			
 			}
 		}
 					
