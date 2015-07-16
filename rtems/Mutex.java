@@ -43,8 +43,6 @@ public class Mutex extends Lock {
 						{
 							synchronized(holder)
 							{
-
-
 								assert (thisThread.currentPriority == thisThread.getPriority());
 								thisThread.state = Thread.State.WAITING;
 								updatePriority(thisThread.currentPriority);
@@ -54,9 +52,10 @@ public class Mutex extends Lock {
 								}
 								thisThread.wait = waitQueue;
 								thisThread.trylock = this;
+								wait();
 							}
 						}
-						wait();
+						
 								
 						}catch (InterruptedException e) 
 					{}
@@ -151,13 +150,19 @@ there should be no higher priority thread contending on any of the mutex still h
 			Iterator<Mutex> mItr = thisThread.mutexOrderList.iterator();
 			while (mItr.hasNext()){
 				chkMtx = mItr.next();
-				System.out.println("--->Mutex: "+chkMtx.id);
-				chkThr = chkMtx.waitQueue.peek();
-				if(chkThr!=null)
+				synchronized(chkMtx)
 				{
-					System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
-					assert (thisThread.getPriority()<=chkThr.getPriority());	
+					System.out.println("--->Mutex: "+chkMtx.id);
+					chkThr = chkMtx.waitQueue.peek();	
+					
+						if(chkThr!=null)
+						{
+							System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
+							assert (thisThread.getPriority()<=chkThr.getPriority());	
+						}
 				}
+				
+				
 			}
 		}
 	}
