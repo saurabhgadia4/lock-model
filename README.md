@@ -10,5 +10,5 @@
 == Branch Objective ==
 
 * This branch deals with attempt to remove biglock from JPF model.
-* This branch demonstrates successful implementation of test_2_0 for global lock free JPF model.
+* This branch demonstrates successful implementation of spsem03 for global lock free JPF model.
 
