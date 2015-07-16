@@ -32,14 +32,22 @@ public class RTEMSThread extends Thread {
 	}
 
 	public int getMutexIndex(Mutex obj){
-		return mutexOrderList.indexOf(obj);
+		synchronized(mutexOrderList)
+		{
+			return mutexOrderList.indexOf(obj);	
+		}
+		
 	}
 
 	public void pushMutex(Mutex obj){
-		assert !(mutexOrderList.contains(this));
-		obj.priorityBefore = currentPriority;
-		mutexOrderList.add(0, obj);
-		assert wait == null;
-		assert trylock == null;
+		synchronized(mutexOrderList)
+		{
+			assert !(mutexOrderList.contains(this));
+			obj.priorityBefore = currentPriority;
+			mutexOrderList.add(0, obj);
+			assert wait == null;
+			assert trylock == null;	
+		}
+		
 	}
 }
