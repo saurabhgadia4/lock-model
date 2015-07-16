@@ -12,6 +12,7 @@ public class Mutex extends Lock {
 	int priorityBefore=-1;
 	MyComparator comparator = new MyComparator();
 	PriorityQueue<RTEMSThread> waitQueue = new PriorityQueue<RTEMSThread>(7, comparator);
+	public Object mutexLock = new Object();
 	public static final int REC_UPDATE = 1;
   	public static final int NONREC_UPDATE = 0;
 	public static int USE_MODEL=NONREC_UPDATE;
@@ -31,7 +32,7 @@ public class Mutex extends Lock {
 	}
 
 	public synchronized void lock() {
-		synchronized(this)
+		synchronized(this.mutexLock)
 		{
 			RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 			while((holder!=null) && (holder!=thisThread))
@@ -55,9 +56,12 @@ public class Mutex extends Lock {
 			assert thisThread.getState() != Thread.State.WAITING;
 			if(holder==null)
 			{
-				holder = thisThread;
-				holder.pushMutex(this);
-				assert nestCount==0;
+				synchronized(thisThread.rtemsThreadLock)
+				{
+					holder = thisThread;
+					holder.pushMutex(this);
+					assert nestCount==0;
+				}
 			}
 			nestCount++;
 			thisThread.resourceCount++;
@@ -72,38 +76,36 @@ public class Mutex extends Lock {
 		int stepdownPri;
 		assert nestCount>0;
 		assert thisThread.resourceCount>0;
-		synchronized(this)
+		synchronized(this.mutexLock)
 		{
 
 			nestCount--;
 			thisThread.resourceCount--;
 			if(nestCount==0)
 			{
-				synchronized(thisThread){
-					topMutex = thisThread.mutexOrderList.get(0);
-					assert this==topMutex;		
-					topMutex = thisThread.mutexOrderList.remove(0);
+					synchronized(thisThread.rtemsThreadLock)
+					{
+						topMutex = thisThread.mutexOrderList.get(0);
+						assert this==topMutex;		
+						topMutex = thisThread.mutexOrderList.remove(0);
 						thisThread.setPriority(priorityBefore);
 						thisThread.currentPriority = priorityBefore;	
+					}
 				
 					validator();
 					assert holder!=null;
 					assert holder.wait==null;
 					assert holder.trylock==null;
-					synchronized(holder)
-					{
-						holder = waitQueue.poll();			
-						if(holder != null){
-						assert holder.state==Thread.State.WAITING;
-						holder.state = Thread.State.RUNNABLE;
-						holder.wait = null;
-						holder.trylock = null;
-						holder.pushMutex(this);
-						notifyAll();
+				
+					holder = waitQueue.poll();			
+					if(holder != null){
+					assert holder.state==Thread.State.WAITING;
+					holder.state = Thread.State.RUNNABLE;
+					holder.wait = null;
+					holder.trylock = null;
+					holder.pushMutex(this);
+					notifyAll();
 						}
-					}
-					
-				}
 			
 			}
 		}
@@ -119,7 +121,6 @@ there should be no higher priority thread contending on any of the mutex still h
 		RTEMSThread chkThr;
 		Mutex chkMtx;
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-		synchronized(thisThread) {
 			Iterator<Mutex> mItr = thisThread.mutexOrderList.iterator();
 			while (mItr.hasNext()){
 				chkMtx = mItr.next();
@@ -131,8 +132,6 @@ there should be no higher priority thread contending on any of the mutex still h
 					assert (thisThread.getPriority()<=chkThr.getPriority());	
 				}
 			}
-			
-		}
 
 	}
 
@@ -145,7 +144,8 @@ there should be no higher priority thread contending on any of the mutex still h
 	{
 		RTEMSThread parentThread;
 
-		synchronized(holder) {
+		synchronized(holder.rtemsThreadLock)
+		{
 			if(USE_MODEL==REC_UPDATE)
 			{
 				updateRecPriority(priority);
@@ -155,18 +155,16 @@ there should be no higher priority thread contending on any of the mutex still h
 				updateNonRecPriority(priority);
 			}
 
-				if(holder.wait!=null){
-					assert holder.trylock!=null;
-					reEnqueue();
-					parentThread = holder.trylock.holder;
-					if(parentThread.currentPriority > holder.currentPriority)
-					{
-						holder.trylock.updatePriority(holder.currentPriority);
-					}
+			if(holder.wait!=null){
+				assert holder.trylock!=null;
+				reEnqueue();
+				parentThread = holder.trylock.holder;
+				if(parentThread.currentPriority > holder.currentPriority)
+				{
+					holder.trylock.updatePriority(holder.currentPriority);
 				}
-
+			}
 		}
-
 	}
 
 	public void updateNonRecPriority(int priority)
