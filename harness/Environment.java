@@ -40,12 +40,12 @@ public class Environment {
     t0.start();
     
     //Creating thread 1 trying to acquire lock 2, lock 0
-    RTEMSThread t1 = new TestThread(new int[]{0}, 2);
+    RTEMSThread t1 = new TestThread(new int[]{2, 0}, 2);
     t1.start();
 
     //creating thread 2 trying to acquire lock1, lock2
-    /*RTEMSThread t2 = new TestThread(new int[]{1}, 1);
-    t2.start();*/
+    RTEMSThread t2 = new TestThread(new int[]{2, 0}, 1);
+    t2.start();
 
     System.exit(1);
   }
