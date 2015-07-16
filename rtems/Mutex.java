@@ -127,6 +127,10 @@ public class Mutex extends Lock {
 						}
 
 					}
+					else
+					{
+						holder = null;
+					}
 			
 			}
 		}
