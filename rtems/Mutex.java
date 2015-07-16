@@ -90,15 +90,19 @@ public class Mutex extends Lock {
 					assert holder!=null;
 					assert holder.wait==null;
 					assert holder.trylock==null;
-					holder = waitQueue.poll();			
-					if(holder != null){
+					synchronized(holder)
+					{
+						holder = waitQueue.poll();			
+						if(holder != null){
 						assert holder.state==Thread.State.WAITING;
 						holder.state = Thread.State.RUNNABLE;
 						holder.wait = null;
 						holder.trylock = null;
 						holder.pushMutex(this);
 						notifyAll();
+						}
 					}
+					
 				}
 			
 			}
@@ -150,15 +154,16 @@ there should be no higher priority thread contending on any of the mutex still h
 			{
 				updateNonRecPriority(priority);
 			}
-			if(holder.wait!=null){
-				assert holder.trylock!=null;
-				reEnqueue();
-				parentThread = holder.trylock.holder;
-				if(parentThread.currentPriority > holder.currentPriority)
-				{
-					holder.trylock.updatePriority(holder.currentPriority);
+
+				if(holder.wait!=null){
+					assert holder.trylock!=null;
+					reEnqueue();
+					parentThread = holder.trylock.holder;
+					if(parentThread.currentPriority > holder.currentPriority)
+					{
+						holder.trylock.updatePriority(holder.currentPriority);
+					}
 				}
-			}
 
 		}
 
