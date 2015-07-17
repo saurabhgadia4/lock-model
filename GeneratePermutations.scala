@@ -67,13 +67,17 @@ object GeneratePermutations {
     // can be mapped to strings starting with only 1s followed by 1
     // (swapping 1 and 2)
 
-    val canonChoices3 =
-      (canonChoices map(choice => {
-	if (choice.matches("^0+2.*$")) swap(choice, '1', '2')
-	else choice
-      })).distinct
+    val results = new HashSet[String]
+    for (choice <- canonChoices) {
+      if (!results.contains(choice) &&
+	  !results.contains(sortedLockIDs(swap(choice, '0', '1'))) &&
+	  !results.contains(sortedLockIDs(swap(choice, '0', '2'))) &&
+	  !results.contains(sortedLockIDs(swap(choice, '1', '2')))) {
+	results += choice
+      }
+    }
 
-    for (choice <- canonChoices3) {
+    for (choice <- results.toList.sorted) {
       Console.out.println(choice)
     }
   }
