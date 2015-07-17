@@ -18,6 +18,9 @@ object GeneratePermutations {
     }))
   }
 
+  def sortedLockIDs(in: String) =
+    new String(List(in.substring(0, 2), in.substring(2, 4), in.substring(4, 6)).sorted.flatten.toArray)
+
   def main(args: Array[String]) {
     val locks = List("a", "b", "c")
     val n = 6
@@ -55,8 +58,7 @@ object GeneratePermutations {
 	}
       })).distinct
 
-    val canonChoices = canonChoices2.map(ch =>
-      new String(List(ch.substring(0, 2), ch.substring(2, 4), ch.substring(4, 6)).sorted.flatten.toArray)).distinct
+    val canonChoices = canonChoices2.map(s => sortedLockIDs(s)).distinct
     // JPF explores all interleavings (combinations) of
     // the lock choices (2 locks each) of the 3 individual threads,
     // so they can be sorted for a canonical representation
