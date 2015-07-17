@@ -23,11 +23,7 @@ public class Environment {
   }
 
   public final static void main(String[] args) {
-    /*int li1 = Verify.getInt(0, locks.length - 1);
-    int li2 = Verify.getInt(0, locks.length - 1);
-    int li3 = Verify.getInt(0, locks.length - 1);*/
-    int li1 = 0;
-    int li2 = 1;
+    assert(args.length == 3);
     int prio1 = 2;
     int prio2 = 2;
     int prio3 = 2;
@@ -38,20 +34,26 @@ public class Environment {
       default: // 3: no need to change the defaults 2, 2, 2: all same
     }
     Mutex.setUpdateMethod(model);
-    RTEMSThread t0 = new TestThread(new int[]{li1, li2}, prio1);
-    System.out.println("Thread 0 has priority " + t0.getPriority() +
-		       " and uses locks " + li1 + //", " + li2 +
-		       ", and " + li2 + ".");
+    RTEMSThread t0 =
+      new TestThread(new int[]{(int)(new String(args[0]).charAt(0)) - '0',
+			       (int)(new String(args[0]).charAt(1)) - '0'},
+		     prio1);
     t0.start();
     
     //Creating thread 1 trying to acquire lock 2, lock 0
-    RTEMSThread t1 = new TestThread(new int[]{2, 0}, prio2);
+    RTEMSThread t1 =
+      new TestThread(new int[]{(int)(new String(args[1]).charAt(0)) - '0',
+			       (int)(new String(args[1]).charAt(1)) - '0'},
+		     prio2);
     t1.start();
 
     //creating thread 2 trying to acquire lock1, lock2
-    RTEMSThread t2 = new TestThread(new int[]{1, 2}, prio3);
+    RTEMSThread t2 =
+      new TestThread(new int[]{(int)(new String(args[2]).charAt(0)) - '0',
+			       (int)(new String(args[2]).charAt(1)) - '0'},
+		     prio2);
     t2.start();
 
-    System.exit(1);
+    System.exit(0);
   }
 }

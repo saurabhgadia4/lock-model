@@ -6,4 +6,17 @@ then
 	exit
 fi
 
-$JPF_HOME/bin/jpf +verbose Locks.jpf
+if [ ! -e "$1" ]
+then
+	echo "Usage: ./jpf.sh <file with lock permutations>"
+	exit
+fi
+
+for p in `cat "$1"`
+do
+	p1="`echo $p | sed -e 's/....$//'`"
+	p2="`echo $p | sed -e 's/^..//' -e 's/..$//'`"
+	p3="`echo $p | sed -e 's/^....//'`"
+	echo ====== Lock indices uses by threads 1, 2, 3 = ${p1} ${p2} ${p3} ======
+	$JPF_HOME/bin/jpf +verbose Locks.jpf +target.args=${p1},${p2},${p3}
+done
