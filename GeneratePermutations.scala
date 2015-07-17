@@ -10,6 +10,14 @@ import scala.collection.mutable.HashSet
    represent lock choices of each thread, whose order does not matter. */
 
 object GeneratePermutations {
+  def swap(in: String, ch1: Char, ch2: Char) = {
+    new String(in.toCharArray.map(ch => ch match {
+      case `ch1` => `ch2`
+      case `ch2` => `ch1`
+      case _ => ch
+    }))
+  }
+
   def main(args: Array[String]) {
     val locks = List("a", "b", "c")
     val n = 6
@@ -59,13 +67,8 @@ object GeneratePermutations {
 
     val canonChoices3 =
       (canonChoices map(choice => {
-	if (choice.matches("^0+2.*$")) { // swap 1 and 2
-	  new String(choice.toCharArray.map(ch => ch match {
-	    case '0' => '0'
-	    case '1' => '2'
-	    case '2' => '1'
-	  }))
-	} else choice
+	if (choice.matches("^0+2.*$")) swap(choice, '1', '2')
+	else choice
       })).distinct
 
     for (choice <- canonChoices3) {
