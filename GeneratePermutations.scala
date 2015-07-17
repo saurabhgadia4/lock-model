@@ -1,5 +1,14 @@
 import scala.collection.mutable.HashSet
 
+/* This code currenly generates more permutations than necessary.
+   The first two steps should be replaced by strictly assigning
+   minimal numbers to each distinct letter in the sequence.
+
+   For example aaabcc and aaacbb can both be mapped to 000122.
+
+   The current algorithm creates two outputs, which is more than
+   what is needed. */
+
 object GeneratePermutations {
   def main(args: Array[String]) {
     val locks = List("0", "1", "2")
