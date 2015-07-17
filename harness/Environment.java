@@ -31,12 +31,11 @@ public class Environment {
     int prio1 = 2;
     int prio2 = 2;
     int prio3 = 2;
-    switch (Verify.getInt(0, 4)) {
-      case 0: prio1 = 3; prio3 = 1; break; // 3, 2, 1
-      case 1: prio1 = 1; prio3 = 3; break; // 1, 2, 3
-      case 2: prio3 = 1; break; // 2, 2, 1
-      case 3: prio3 = 3; break; // 2, 2, 3
-      default: // 4: no need to change the defaults 2, 2, 2
+    switch (Verify.getInt(0, 3)) {
+      case 0: prio1 = 3; prio3 = 1; break; // 3, 2, 1: all prios differ
+      case 1: prio3 = 1; break; // 2, 2, 1: two prios match, one higher
+      case 2: prio3 = 3; break; // 2, 2, 3: two prios match: one lower
+      default: // 3: no need to change the defaults 2, 2, 2: all same
     }
     Mutex.setUpdateMethod(model);
     RTEMSThread t0 = new TestThread(new int[]{li1, li2}, prio1);
