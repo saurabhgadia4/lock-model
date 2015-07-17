@@ -63,9 +63,8 @@ object GeneratePermutations {
     // the lock choices (2 locks each) of the 3 individual threads,
     // so they can be sorted for a canonical representation
 
-    // post-processing: Strings starting with only 0s followed by 2
-    // can be mapped to strings starting with only 1s followed by 1
-    // (swapping 1 and 2)
+    // post-processing: remove isomorphic strings by attempting to
+    // match renamings
 
     val results = new HashSet[String]
     for (choice <- canonChoices) {
