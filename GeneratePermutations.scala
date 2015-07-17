@@ -23,7 +23,7 @@ object GeneratePermutations {
 	val firstChar = choice.charAt(0)
 	new String(choice.toCharArray.map(ch =>
           if (ch == firstChar) { '0' } else { ch }))
-      }))
+      })).distinct
 
     val canonChoices1 =
       (canonChoices0 map(choice => {
@@ -34,7 +34,7 @@ object GeneratePermutations {
               if (ch == ch2) { '1' } else { ch }))
 	  case None => choice // do not change string
 	}
-      }))
+      })).distinct
 
     val canonChoices2 =
       (canonChoices1 map(choice => {
@@ -45,7 +45,7 @@ object GeneratePermutations {
               if (ch == ch3) { '2' } else { ch }))
 	  case None => choice // do not change string
 	}
-      }))
+      })).distinct
 
     val canonChoices = canonChoices2.map(ch =>
       new String(List(ch.substring(0, 2), ch.substring(2, 4), ch.substring(4, 6)).sorted.flatten.toArray)).distinct
@@ -53,7 +53,22 @@ object GeneratePermutations {
     // the lock choices (2 locks each) of the 3 individual threads,
     // so they can be sorted for a canonical representation
 
-    for (choice <- canonChoices) {
+    // post-processing: Strings starting with only 0s followed by 2
+    // can be mapped to strings starting with only 1s followed by 1
+    // (swapping 1 and 2)
+
+    val canonChoices3 =
+      (canonChoices map(choice => {
+	if (choice.matches("^0+2.*$")) { // swap 1 and 2
+	  new String(choice.toCharArray.map(ch => ch match {
+	    case '0' => '0'
+	    case '1' => '2'
+	    case '2' => '1'
+	  }))
+	} else choice
+      })).distinct
+
+    for (choice <- canonChoices3) {
       Console.out.println(choice)
     }
   }
