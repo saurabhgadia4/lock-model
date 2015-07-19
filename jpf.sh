@@ -18,5 +18,5 @@ do
 	p2="`echo $p | sed -e 's/^..//' -e 's/..$//'`"
 	p3="`echo $p | sed -e 's/^....//'`"
 	echo ====== Lock indices uses by threads 1, 2, 3 = ${p1} ${p2} ${p3} ======
-	time $JPF_HOME/bin/jpf +verbose Locks.jpf +target.args=${p1},${p2},${p3} >& jpf-${p1}-${p2}-${p3}.log
+	time $JPF_HOME/bin/jpf +verbose Locks.jpf +target.args=${p1},${p2},${p3} &> jpf-${p1}-${p2}-${p3}.log
 done
