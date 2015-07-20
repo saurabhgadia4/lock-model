@@ -1,77 +1,56 @@
 import scala.collection.mutable.HashSet
+import scala.collection.mutable.ListBuffer
 
-/* Create only necessary permutations by first generating all
-   string permutations, then mapping each character to a unique
-   small integer in order.
+/* Create only necessary permutations of strings representing lock id
+   choices.
 
-   For example, aaabcc and aaacbb can both be mapped to 000122.
-
-   Finally we exploit the fact that the two-character subsequences
+   We exploit the fact that the two-character subsequences
    represent lock choices of each thread, whose order does not matter. */
 
 object GeneratePermutations {
-  def swap(in: String, ch1: Char, ch2: Char) = {
-    new String(in.toCharArray.map(ch => ch match {
-      case `ch1` => `ch2`
-      case `ch2` => `ch1`
-      case _ => ch
-    }))
+  val Charset = "012"
+  val Perms = Charset.toCharArray.toList.permutations.toList
+
+  def found(strs: List[String], in: HashSet[String]): Boolean = {
+    for (str <- strs) {
+      if (in.contains(str)) {
+	return true
+      }
+    }
+    return false
+  }
+
+  def generateIso(in: String) = { // generate all isomorphisms over alphabet
+    val results = new ListBuffer[String]
+    for (p <- Perms) {
+      results +=
+	new String(in.toCharArray.toList.map(ch =>
+					     p(ch.asInstanceOf[Char] - 48)).toArray)
+    }
+    results.toList
   }
 
   def sortedLockIDs(in: String) =
     new String(List(in.substring(0, 2), in.substring(2, 4), in.substring(4, 6)).sorted.flatten.toArray)
 
   def main(args: Array[String]) {
-    val locks = List("a", "b", "c")
+    val locks = List("0", "1", "2")
     val n = 6
     val allChoices =
       Iterable.fill(n)(locks) reduceLeft { (a, b) =>
         for(a<-a;b<-b) yield a+b
       }
 
-    val canonChoices0 =
-      (allChoices map(choice => {
-	val firstChar = choice.charAt(0)
-	new String(choice.toCharArray.map(ch =>
-          if (ch == firstChar) { '0' } else { ch }))
-      })).distinct
-
-    val canonChoices1 =
-      (canonChoices0 map(choice => {
-	val secondChar = choice.toCharArray.find(_ != '0')
-	secondChar match {
-	  case Some(ch2: Char) =>
-	    new String(choice.toCharArray.map(ch =>
-              if (ch == ch2) { '1' } else { ch }))
-	  case None => choice // do not change string
-	}
-      })).distinct
-
-    val canonChoices2 =
-      (canonChoices1 map(choice => {
-	val thirdChar = choice.toCharArray.find(c => (c != '0') & (c != '1'))
-	thirdChar match {
-	  case Some(ch3: Char) =>
-	    new String(choice.toCharArray.map(ch =>
-              if (ch == ch3) { '2' } else { ch }))
-	  case None => choice // do not change string
-	}
-      })).distinct
-
-    val canonChoices = canonChoices2.map(s => sortedLockIDs(s)).distinct
     // JPF explores all interleavings (combinations) of
     // the lock choices (2 locks each) of the 3 individual threads,
     // so they can be sorted for a canonical representation
 
-    // post-processing: remove isomorphic strings by attempting to
-    // match renamings
+    // remove isomorphic strings by attempting to match renamings
 
     val results = new HashSet[String]
-    for (choice <- canonChoices) {
-      if (!results.contains(choice) &&
-	  !results.contains(sortedLockIDs(swap(choice, '0', '1'))) &&
-	  !results.contains(sortedLockIDs(swap(choice, '0', '2'))) &&
-	  !results.contains(sortedLockIDs(swap(choice, '1', '2')))) {
+    for (choice <- allChoices) {
+      val iso = generateIso(choice).map(s => sortedLockIDs(s)).distinct
+      if (!found(iso, results)) {
 	results += choice
       }
     }
