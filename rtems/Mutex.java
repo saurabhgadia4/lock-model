@@ -81,7 +81,7 @@ public class Mutex extends Lock {
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 		RTEMSThread candidateThr;
 		int stepdownPri;
-		synchronized(this)
+		synchronized(this)            //trylock
 		{
 
 
@@ -114,17 +114,15 @@ public class Mutex extends Lock {
 					//----------------------------------->>>waiting here for updaterecpriority to release candidateThr intrinsic locks
 					if(candidateThr != null)
 					{
-						synchronized(candidateThr)
-						{
-							holder = candidateThr;
-							assert holder.state==Thread.State.WAITING;
-							holder.state = Thread.State.RUNNABLE;
-							holder.wait = null;
-							holder.trylock = null;
-							holder.pushMutex(this);
-							notifyAll();							
-						}
-
+					
+						holder = candidateThr;
+						assert holder.state==Thread.State.WAITING;
+						holder.state = Thread.State.RUNNABLE;
+						holder.wait = null;
+						holder.trylock = null;
+						holder.pushMutex(this);
+						notifyAll();							
+					
 					}
 					else
 					{
@@ -170,8 +168,9 @@ there should be no higher priority thread contending on any of the mutex still h
 	public void updatePriority(int priority)
 	{
 
-		RTEMSThread parentThread;
-		
+		RTEMSThread trylockHolder;
+		int preUpdateHolderPriority = holder.currentPriority;
+		int postUdateHolderPriority = -1;
 		if(USE_MODEL==REC_UPDATE)
 		{
 			updateRecPriority(priority);
@@ -180,8 +179,15 @@ there should be no higher priority thread contending on any of the mutex still h
 		{
 			updateNonRecPriority(priority);
 		}
-	
-		if(holder.wait!=null){
+		postUdateHolderPriority = holder.currentPriority;
+		/*
+		We cand avoid idempotent operations when holder.currentPriority did not got changed 
+		by the current executing thread when holder is waiting. As current priority of holder remains same then
+		what is the point in stepping below code flow because holder while acquring its trylock would have 
+		already gone through updateRecPriority procedure.
+		*/
+
+		if((holder.wait!=null) &&(preUpdateHolderPriority==postUdateHolderPriority)){ 
 			
 			assert holder.trylock!=null;
 			//no need to do synchronized(holder.trylock) as parentthread can't change as holder can no more be set
@@ -189,20 +195,25 @@ there should be no higher priority thread contending on any of the mutex still h
 			//so need to gain access to holder.trylock.
 			synchronized(holder.trylock)
 			{
-				reEnqueue();
-				
-				//as we have the lock over holder and parentthread is waiting for this lock to get released.
-				//or parentThread cannot change
-				parentThread = holder.trylock.holder;
-				synchronized(parentThread)
+				//We need to oncce again check whether holder.trylock==NULL 
+				if(holder.trylock!=null)
 				{
-					//just need to check whether parentThread still has the holder in it. To confirm that poll has not yet happened
-					//i.e holder is not candidate thread choosen by 
-					if(parentThread.currentPriority > holder.currentPriority)
+
+					reEnqueue();
+					//as we have the lock over holder and parentthread is waiting for this lock to get released.
+					//or parentThread cannot change
+					trylockHolder = holder.trylock.holder;
+					synchronized(trylockHolder)
 					{
-						holder.trylock.updatePriority(holder.currentPriority);
+						//just need to check whether parentThread still has the holder in it. To confirm that poll has not yet happened
+						//i.e holder is not candidate thread choosen by 
+						if(trylockHolder.currentPriority > holder.currentPriority)
+						{
+							holder.trylock.updatePriority(holder.currentPriority);
+						}
 					}
-				}	
+				}
+		
 			}
 			
 		}
