@@ -31,7 +31,7 @@ public class Mutex extends Lock {
 	}
 
 	public void lock() {
-		synchronized(this)
+		synchronized(Mutex.class)
 		{
 			RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 
@@ -39,9 +39,9 @@ public class Mutex extends Lock {
 			{
 					
 					try{
-						synchronized(thisThread)
+						synchronized(Mutex.class)
 						{
-							synchronized(holder)
+							synchronized(Mutex.class)
 							{
 								assert (thisThread.currentPriority == thisThread.getPriority());
 								thisThread.state = Thread.State.WAITING;
@@ -54,7 +54,7 @@ public class Mutex extends Lock {
 								thisThread.trylock = this;
 							}
 						}
-						wait();
+						Mutex.class.wait();
 
 						}catch (InterruptedException e) 
 					{}
@@ -63,7 +63,7 @@ public class Mutex extends Lock {
 			assert thisThread.getState() != Thread.State.WAITING;
 			if(holder==null)
 			{
-				synchronized(thisThread)
+				synchronized(Mutex.class)
 				{
 					holder = thisThread;
 					holder.pushMutex(this);
@@ -80,7 +80,7 @@ public class Mutex extends Lock {
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 		RTEMSThread candidateThr;
 		int stepdownPri;
-		synchronized(this)            //trylock
+		synchronized(Mutex.class)            //trylock
 		{
 
 
@@ -90,7 +90,7 @@ public class Mutex extends Lock {
 			thisThread.resourceCount--;
 			if(nestCount==0)
 			{
-					synchronized(thisThread)
+					synchronized(Mutex.class)
 					{
 						topMutex = thisThread.mutexOrderList.get(0);
 						assert this==topMutex;		
@@ -119,7 +119,7 @@ public class Mutex extends Lock {
 						holder.wait = null;
 						holder.trylock = null;
 						holder.pushMutex(this);
-						notifyAll();							
+						Mutex.class.notifyAll();							
 					
 					}
 					else
@@ -142,12 +142,12 @@ there should be no higher priority thread contending on any of the mutex still h
 		RTEMSThread chkThr;
 		Mutex chkMtx;
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-		synchronized(this)
+		synchronized(Mutex.class)
 		{
 			Iterator<Mutex> mItr = thisThread.mutexOrderList.iterator();
 			while (mItr.hasNext()){
 				chkMtx = mItr.next();
-				synchronized(chkMtx)
+				synchronized(Mutex.class)
 				{
 					System.out.println("--->Mutex: "+chkMtx.id);
 					chkThr = chkMtx.waitQueue.peek();	
@@ -189,10 +189,10 @@ there should be no higher priority thread contending on any of the mutex still h
 		if((holder.wait!=null) &&(preUpdateHolderPriority==postUdateHolderPriority)){ 
 			
 			assert holder.trylock!=null;
-			//no need to do synchronized(holder.trylock) as parentthread can't change as holder can no more be set
+			//no need to do synchronized(Mutex.class) as parentthread can't change as holder can no more be set
 			//but other threads may also waiting on holer.trylock and we can expect the same movements from them.
 			//so need to gain access to holder.trylock.
-			synchronized(holder.trylock)
+			synchronized(Mutex.class)
 			{
 				//We need to oncce again check whether holder.trylock==NULL 
 				if(holder.trylock!=null)
@@ -202,7 +202,7 @@ there should be no higher priority thread contending on any of the mutex still h
 					//as we have the lock over holder and parentthread is waiting for this lock to get released.
 					//or parentThread cannot change
 					trylockHolder = holder.trylock.holder;
-					synchronized(trylockHolder)
+					synchronized(Mutex.class)
 					{
 						//just need to check whether parentThread still has the holder in it. To confirm that poll has not yet happened
 						//i.e holder is not candidate thread choosen by 

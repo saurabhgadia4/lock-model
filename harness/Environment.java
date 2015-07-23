@@ -51,16 +51,5 @@ public class Environment {
 			       (int)(new String(args[2]).charAt(1)) - '0'},
 		     prio2);
     t2.start();
-
-    try{
-      t0.join();
-      t1.join();
-      t2.join();
-      }catch(InterruptedException e){
-        e.printStackTrace();
-    }
-
-  
-
   }
 }
