@@ -3,8 +3,6 @@ package harness;
 import base.Lock;
 import rtems.Mutex;
 import rtems.RTEMSThread;
-
-//import gov.nasa.jpf.jvm.Verify;
 import gov.nasa.jpf.vm.Verify;
 
 public class Environment {
@@ -54,6 +52,15 @@ public class Environment {
 		     prio2);
     t2.start();
 
-    System.exit(0);
+    try{
+      t0.join();
+      t1.join();
+      t2.join();
+      }catch(InterruptedException e){
+        e.printStackTrace();
+    }
+
+  
+
   }
 }
