@@ -12,6 +12,8 @@ then
 	exit
 fi
 
+[ -d logs ] || mkdir logs
+
 for p in `cat "$1"`
 do
 	p1="`echo $p | sed -e 's/....$//'`"
