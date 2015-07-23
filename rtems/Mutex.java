@@ -55,7 +55,7 @@ public class Mutex extends Lock {
 							}
 						}
 						wait();
-						
+
 						}catch (InterruptedException e) 
 					{}
 				
@@ -97,7 +97,6 @@ public class Mutex extends Lock {
 						topMutex = thisThread.mutexOrderList.remove(0);
 						thisThread.setPriority(priorityBefore);
 						thisThread.currentPriority = priorityBefore;	
-						validator();
 					
 						assert holder!=null;
 						assert holder.wait==null;
@@ -129,6 +128,7 @@ public class Mutex extends Lock {
 					}
 			
 			}
+			validator();
 		}
 					
 	}
