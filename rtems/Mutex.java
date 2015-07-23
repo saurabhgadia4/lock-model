@@ -52,11 +52,10 @@ public class Mutex extends Lock {
 								}
 								thisThread.wait = waitQueue;
 								thisThread.trylock = this;
-								wait();
 							}
 						}
+						wait();
 						
-								
 						}catch (InterruptedException e) 
 					{}
 				
