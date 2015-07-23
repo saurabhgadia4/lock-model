@@ -23,19 +23,19 @@ public class RTEMSThread extends Thread {
 		this.trylock = null;
 	}
 
-	public synchronized void setCurrentPriority(int priority){
+	public void setCurrentPriority(int priority){
 		currentPriority = priority;
 	}
 
-	public synchronized void setRealPriority(int priority){
+	public void setRealPriority(int priority){
 		realPriority = priority;
 	}
 
-	public synchronized int getMutexIndex(Mutex obj){
+	public int getMutexIndex(Mutex obj){
 		return mutexOrderList.indexOf(obj);	
 	}
 
-	public synchronized void pushMutex(Mutex obj){
+	public void pushMutex(Mutex obj){
 		assert !(mutexOrderList.contains(this));
 		obj.priorityBefore = currentPriority;
 		mutexOrderList.add(0, obj);
