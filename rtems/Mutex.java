@@ -186,7 +186,7 @@ there should be no higher priority thread contending on any of the mutex still h
 		already gone through updateRecPriority procedure.
 		*/
 
-		if((holder.wait!=null) &&(preUpdateHolderPriority==postUdateHolderPriority)){ 
+		if((holder.wait!=null) &&(preUpdateHolderPriority!=postUdateHolderPriority)){ 
 			
 			assert holder.trylock!=null;
 			//no need to do synchronized(holder.trylock) as parentthread can't change as holder can no more be set
