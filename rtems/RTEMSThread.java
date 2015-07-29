@@ -15,6 +15,7 @@ public class RTEMSThread extends Thread {
 	public Mutex trylock;
 	public Object current_lock;
 	public Object default_lock = new Object();
+	public int set_default_lock;
 
 	public RTEMSThread(int priority) {
 		this.mutexOrderList = new ArrayList<Mutex>();
@@ -22,6 +23,7 @@ public class RTEMSThread extends Thread {
 		this.setPriority(priority);
 		this.currentPriority = this.realPriority = this.getPriority();
 		this.trylock = null;
+		this.set_default_lock = 0;
 		current_lock = default_lock;
 	}
 

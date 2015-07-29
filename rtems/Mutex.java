@@ -40,10 +40,16 @@ public class Mutex extends Lock {
 			{
 					
 					try{
-						synchronized(thisThread.current_lock)
+						synchronized(thisThread.current_lock)   //This locking is not present in RTEMS which may lead to data race as pointed in mail
 						{
 							synchronized(holder.current_lock)
 							{
+								if (holder.set_default_lock){
+									holder.current_lock = holder.default_lock;
+									holder.wait = null;
+									holder.trylock = null;
+									holder.set_default_lock = 0;
+								}
 								assert (thisThread.currentPriority == thisThread.getPriority());
 								thisThread.state = Thread.State.WAITING;
 								updatePriority(thisThread.currentPriority);
@@ -54,6 +60,7 @@ public class Mutex extends Lock {
 								thisThread.wait = waitQueue;
 								thisThread.trylock = this;
 								thisThread.current_lock = wq_lock;
+								thisThread.set_default_lock = 0;
 							}
 						}
 						wq_lock.wait();
@@ -71,6 +78,14 @@ public class Mutex extends Lock {
 					holder.pushMutex(this);
 					assert nestCount==0;
 				}
+			}
+			//here holder == thisThread
+			if(holder.set_default_lock)
+			{
+				holder.current_lock = holder.default_lock;
+				holder.wait = null;
+				holder.trylock = null;
+				holder.set_default_lock = 0;
 			}
 			nestCount++;
 			thisThread.resourceCount++;
@@ -92,43 +107,45 @@ public class Mutex extends Lock {
 			thisThread.resourceCount--;
 			if(nestCount==0)
 			{
-					synchronized(thisThread.current_lock)
-					{
-						topMutex = thisThread.mutexOrderList.get(0);
-						assert this==topMutex;		
-						topMutex = thisThread.mutexOrderList.remove(0);
-						thisThread.setPriority(priorityBefore);
-						thisThread.currentPriority = priorityBefore;	
-					
-						assert holder!=null;
-						assert holder.wait==null;
-						assert holder.trylock==null;
-						candidateThr = waitQueue.poll(); 
-						//holder = waitQueue.poll();			
-					}
-					//candidateThr just can't get modified here as it is waiting. Only its priority can be changed
-					//which we should not worry as itself it is at top of waitqueue and its priority can just go high
-					//so we are good.
-					//At this point candidate still has reference to parent thread i.e holder of this mutex as
-					//we have not yet changed holder.
-					//----------------------------------->>>waiting here for updaterecpriority to release candidateThr intrinsic locks
-					if(candidateThr != null)
-					{
-					
-						holder = candidateThr;
-						assert holder.state==Thread.State.WAITING;
-						holder.state = Thread.State.RUNNABLE;
-						holder.wait = null;
-						holder.trylock = null;
-						holder.current_lock = holder.default_lock;
-						holder.pushMutex(this);
-						wq_lock.notifyAll();							
-					
-					}
-					else
-					{
-						holder = null;
-					}
+				synchronized(thisThread.current_lock)
+				{
+					topMutex = thisThread.mutexOrderList.get(0);
+					assert this==topMutex;		
+					topMutex = thisThread.mutexOrderList.remove(0);
+					thisThread.setPriority(priorityBefore);
+					thisThread.currentPriority = priorityBefore;	
+				
+					assert holder!=null;
+					assert holder.wait==null;
+					assert holder.trylock==null;
+					candidateThr = waitQueue.poll(); 
+					//holder = waitQueue.poll();			
+				}
+				//candidateThr just can't get modified here as it is waiting. Only its priority can be changed
+				//which we should not worry as itself it is at top of waitqueue and its priority can just go high
+				//so we are good.
+				//At this point candidate still has reference to parent thread i.e holder of this mutex as
+				//we have not yet changed holder.
+				//----------------------------------->>>waiting here for updaterecpriority to release candidateThr intrinsic locks
+				if(candidateThr != null)
+				{
+				
+					holder = candidateThr;
+					assert holder.state==Thread.State.WAITING;
+					holder.state = Thread.State.RUNNABLE;
+					//holder.wait = null;
+					//holder.trylock = null;
+
+					//holder.current_lock = holder.default_lock;
+					holder.set_default_lock = 1;
+					holder.pushMutex(this);
+					wq_lock.notifyAll();							
+				
+				}
+				else
+				{
+					holder = null;
+				}
 			
 			}
 			validator();
@@ -182,37 +199,20 @@ there should be no higher priority thread contending on any of the mutex still h
 			updateNonRecPriority(priority);
 		}
 		postUdateHolderPriority = holder.currentPriority;
-		/*
-		We cand avoid idempotent operations when holder.currentPriority did not got changed 
-		by the current executing thread when holder is waiting. As current priority of holder remains same then
-		what is the point in stepping below code flow because holder while acquring its trylock would have 
-		already gone through updateRecPriority procedure.
-		*/
 
 		if((holder.wait!=null) &&(preUpdateHolderPriority!=postUdateHolderPriority)){ 
 			
 			assert holder.trylock!=null;
-			//no need to do synchronized(holder.trylock) as parentthread can't change as holder can no more be set
-			//but other threads may also waiting on holer.trylock and we can expect the same movements from them.
-			//so need to gain access to holder.trylock.
-			synchronized(holder.current_lock)
+			reEnqueue();
+			trylockHolder = holder.trylock.holder;
+			synchronized(trylockHolder.current_lock)
 			{
-				//We need to oncce again check whether holder.trylock==NULL 
-
-					reEnqueue();
-					//as we have the lock over holder and parentthread is waiting for this lock to get released.
-					//or parentThread cannot change
-					trylockHolder = holder.trylock.holder;
-					synchronized(trylockHolder.current_lock)
-					{
-						//just need to check whether parentThread still has the holder in it. To confirm that poll has not yet happened
-						//i.e holder is not candidate thread choosen by 
-						if(trylockHolder.currentPriority > holder.currentPriority)
-						{
-							holder.trylock.updatePriority(holder.currentPriority);
-						}
-					}
-		
+				//just need to check whether parentThread still has the holder in it. To confirm that poll has not yet happened
+				//i.e holder is not candidate thread choosen by 
+				if(trylockHolder.currentPriority > holder.currentPriority)
+				{
+					holder.trylock.updatePriority(holder.currentPriority);
+				}
 			}
 			
 		}
