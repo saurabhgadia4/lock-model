@@ -10,5 +10,6 @@
 == Branch Objective ==
 
 * This branch deals with attempt to remove biglock from JPF model.
-* This branch demonstrates successful implementation of spsem03 for global lock free JPF model.
+* This branch is attempt to solve nested mutex problem for SMP architecture and is build upon rtemsjpf-0.6-global-free branch.
+* RTEMSThread and Mutex classes consists of data members with similar nomenclature as compared to legacy RTEMS code. 
 

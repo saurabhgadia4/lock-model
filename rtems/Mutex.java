@@ -53,6 +53,7 @@ public class Mutex extends Lock {
 								}
 								thisThread.wait = waitQueue;
 								thisThread.trylock = this;
+								thisThread.current_lock = wq_lock;
 							}
 						}
 						wq_lock.wait();
@@ -119,6 +120,7 @@ public class Mutex extends Lock {
 						holder.state = Thread.State.RUNNABLE;
 						holder.wait = null;
 						holder.trylock = null;
+						holder.current_lock = holder.default_lock;
 						holder.pushMutex(this);
 						wq_lock.notifyAll();							
 					
