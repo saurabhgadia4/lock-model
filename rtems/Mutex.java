@@ -195,21 +195,17 @@ there should be no higher priority thread contending on any of the mutex still h
 			synchronized(Mutex.class)
 			{
 				//We need to oncce again check whether holder.trylock==NULL 
-				if(holder.trylock!=null)
+				reEnqueue();
+				//as we have the lock over holder and parentthread is waiting for this lock to get released.
+				//or parentThread cannot change
+				trylockHolder = holder.trylock.holder;
+				synchronized(Mutex.class)
 				{
-
-					reEnqueue();
-					//as we have the lock over holder and parentthread is waiting for this lock to get released.
-					//or parentThread cannot change
-					trylockHolder = holder.trylock.holder;
-					synchronized(Mutex.class)
+					//just need to check whether parentThread still has the holder in it. To confirm that poll has not yet happened
+					//i.e holder is not candidate thread choosen by
+					if(trylockHolder.currentPriority > holder.currentPriority)
 					{
-						//just need to check whether parentThread still has the holder in it. To confirm that poll has not yet happened
-						//i.e holder is not candidate thread choosen by 
-						if(trylockHolder.currentPriority > holder.currentPriority)
-						{
-							holder.trylock.updatePriority(holder.currentPriority);
-						}
+						holder.trylock.updatePriority(holder.currentPriority);
 					}
 				}
 		
