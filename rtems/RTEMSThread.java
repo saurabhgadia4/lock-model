@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class RTEMSThread extends Thread {
   // TODO: add extra priority field etc.
@@ -13,8 +15,8 @@ public class RTEMSThread extends Thread {
 	public int realPriority;
 	public List<Mutex> mutexOrderList;  //it is a linkedList which stores acquired mutex objects in LIFO order.
 	public Mutex trylock;
-	public Object current_lock;
-	public Object default_lock = new Object();
+	public ReentrantLock current_lock;
+	public ReentrantLock default_lock = new ReentrantLock();;
 	public int set_default_lock;
 
 	public RTEMSThread(int priority) {
