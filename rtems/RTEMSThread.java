@@ -15,8 +15,8 @@ public class RTEMSThread extends Thread {
 	public int realPriority;
 	public List<Mutex> mutexOrderList;  //it is a linkedList which stores acquired mutex objects in LIFO order.
 	public Mutex trylock;
-	public ReentrantLock current_lock;
-	public ReentrantLock default_lock = new ReentrantLock();;
+	public Lock current_lock;
+	public Lock default_lock = new ReentrantLock();
 	public int set_default_lock;
 
 	public RTEMSThread(int priority) {
