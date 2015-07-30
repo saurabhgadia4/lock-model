@@ -1,12 +1,10 @@
 package rtems;
-import base.Lock;
-import base.Condition;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Iterator;
 import java.util.concurrent.locks.*;
 
-public class Mutex extends Lock {
+public class Mutex extends base.Lock {
 	RTEMSThread holder;
 	int id;
 	int nestCount;
@@ -34,7 +32,7 @@ public class Mutex extends Lock {
 	}
 
 	public void lock() {
-		ReentrantLock lock_exh;
+		Lock lock_exh;
 		wq_lock.lock();
 		try
 		{
@@ -74,8 +72,9 @@ public class Mutex extends Lock {
 						}
 
 					} 
-					wq_c1.wait();
-			
+					try {
+						wq_c1.wait();
+					} catch (InterruptedException e) { }
 			}
 			assert thisThread.getState() != Thread.State.WAITING;
 			if(holder==null)
