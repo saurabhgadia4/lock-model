@@ -43,8 +43,8 @@ public class Mutex extends Lock {
 			while((holder!=null) && (holder!=thisThread))
 			{
 					
-					thisThread.current_lock.lock();
-					try{
+					synchronized(thisThread.default_lock)
+					{
 						holder.current_lock.lock();
 						try
 						{
@@ -73,9 +73,7 @@ public class Mutex extends Lock {
 							holder.current_lock.unlock();
 						}
 
-					} finally {
-						thisThread.default_lock.unlock();
-					}
+					} 
 					wq_c1.wait();
 			
 			}
