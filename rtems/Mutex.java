@@ -33,7 +33,8 @@ public class Mutex extends base.Lock {
 
 	public void lock() {
 		Lock lock_exh;
-		synchronized(wq_lock)
+		wq_lock.lock();
+		try
 		{
 			RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 
@@ -72,7 +73,7 @@ public class Mutex extends base.Lock {
 
 					} 
 					try {
-						wq_c1.wait();
+						wq_c1.await();
 					} catch (InterruptedException e) { }
 			}
 			assert thisThread.getState() != Thread.State.WAITING;
@@ -101,6 +102,8 @@ public class Mutex extends base.Lock {
 			
 			nestCount++;
 			thisThread.resourceCount++;
+		} finally {
+			wq_lock.unlock();
 		}
 	}
 
@@ -157,7 +160,7 @@ public class Mutex extends base.Lock {
 					//holder.current_lock = holder.default_lock;
 					holder.set_default_lock = 1;
 					holder.pushMutex(this);
-					wq_c1.notifyAll();							
+					wq_c1.signalAll();							
 				
 				}
 				else
