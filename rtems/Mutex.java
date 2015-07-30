@@ -4,7 +4,8 @@ import base.Condition;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Iterator;
-import java.util.concurrent.locks.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Mutex extends Lock {
 	RTEMSThread holder;
@@ -13,7 +14,7 @@ public class Mutex extends Lock {
 	int priorityBefore=-1;
 	MyComparator comparator = new MyComparator();
 	PriorityQueue<RTEMSThread> waitQueue = new PriorityQueue<RTEMSThread>(7, comparator);
-	public ReentrantLock wq_lock = new ReentrantLock();
+	public Lock wq_lock = new ReentrantLock();
 	public Condition wq_c1 = wq_lock.newCondition();
 	public static final int REC_UPDATE = 1;
   	public static final int NONREC_UPDATE = 0;
