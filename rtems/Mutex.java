@@ -35,8 +35,7 @@ public class Mutex extends Lock {
 
 	public void lock() {
 		ReentrantLock lock_exh;
-		wq_lock.lock();
-		try
+		synchronized(wq_lock)
 		{
 			RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 
@@ -78,32 +77,31 @@ public class Mutex extends Lock {
 			
 			}
 			assert thisThread.getState() != Thread.State.WAITING;
-			if(holder==null)
+			thisThread.current_lock.lock();
+			try
 			{
-				thisThread.current_lock.lock();
-				try
+				if(holder==null)
 				{
 					holder = thisThread;
 					holder.pushMutex(this);
 					assert nestCount==0;
 				}
-				finally {
-					thisThread.current_lock.unlock();
+				if(holder.set_default_lock==1)
+				{
+					lock_exh = holder.current_lock;
+					holder.current_lock = holder.default_lock;
+					holder.wait = null;
+					holder.trylock = null;
+					holder.set_default_lock = 0;
+					lock_exh.unlock();
+					holder.current_lock.lock();
 				}
+			} finally {
+				thisThread.current_lock.unlock();
 			}
-			//here holder == thisThread
-			if(holder.set_default_lock==1)
-			{
-				holder.current_lock = holder.default_lock;
-				holder.wait = null;
-				holder.trylock = null;
-				holder.set_default_lock = 0;
-			}
+			
 			nestCount++;
 			thisThread.resourceCount++;
-		} finally
-		{
-			wq_lock.unlock();
 		}
 	}
 
