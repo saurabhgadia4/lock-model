@@ -74,7 +74,7 @@ public class Mutex extends Lock {
 						}
 
 					} finally {
-						thisThread.current_lock.lock();
+						thisThread.default_lock.unlock();
 					}
 					wq_c1.wait();
 			
