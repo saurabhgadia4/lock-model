@@ -114,11 +114,15 @@ public class Mutex extends Lock {
 					{
 					
 						holder = candidateThr;
-						assert holder.state==Thread.State.WAITING;
-						holder.state = Thread.State.RUNNABLE;
-						holder.wait = null;
-						holder.trylock = null;
-						holder.pushMutex(this);
+						synchronized(holder)
+						{
+							assert holder.state==Thread.State.WAITING;
+							holder.state = Thread.State.RUNNABLE;
+							holder.wait = null;
+							holder.trylock = null;
+							holder.pushMutex(this);	
+						}
+						
 						notifyAll();							
 					
 					}
@@ -192,8 +196,6 @@ there should be no higher priority thread contending on any of the mutex still h
 			//no need to do synchronized(holder.trylock) as parentthread can't change as holder can no more be set
 			//but other threads may also waiting on holer.trylock and we can expect the same movements from them.
 			//so need to gain access to holder.trylock.
-			synchronized(holder.trylock)
-			{
 				//We need to oncce again check whether holder.trylock==NULL 
 				if(holder.trylock!=null)
 				{
@@ -212,8 +214,6 @@ there should be no higher priority thread contending on any of the mutex still h
 						}
 					}
 				}
-		
-			}
 			
 		}
 
