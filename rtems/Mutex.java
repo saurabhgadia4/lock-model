@@ -54,8 +54,8 @@ public class Mutex extends base.Lock {
 								holder.set_default_lock = 0;
 								lock_exh.unlock();
 								holder.current_lock.lock();
-
 							}
+							
 							assert (thisThread.currentPriority == thisThread.getPriority());
 							thisThread.state = Thread.State.WAITING;
 							updatePriority(thisThread.currentPriority);
@@ -142,12 +142,6 @@ public class Mutex extends base.Lock {
 					thisThread.current_lock.unlock();
 				}
 
-				//candidateThr just can't get modified here as it is waiting. Only its priority can be changed
-				//which we should not worry as itself it is at top of waitqueue and its priority can just go high
-				//so we are good.
-				//At this point candidate still has reference to parent thread i.e holder of this mutex as
-				//we have not yet changed holder.
-				//----------------------------------->>>waiting here for updaterecpriority to release candidateThr intrinsic locks
 				if(candidateThr != null)
 				{
 				

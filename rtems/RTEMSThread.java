@@ -46,7 +46,7 @@ public class RTEMSThread extends Thread {
 		assert !(mutexOrderList.contains(this));
 		obj.priorityBefore = currentPriority;
 		mutexOrderList.add(0, obj);
-		assert wait == null;
-		assert trylock == null;	
+		/*assert wait == null;
+		assert trylock == null;	*/
 	}
 }
