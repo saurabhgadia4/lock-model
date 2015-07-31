@@ -10,5 +10,7 @@
 == Branch Objective ==
 
 * This branch deals with attempt to remove biglock from JPF model.
-* This branch demonstrates successful implementation of spsem03 for global lock free JPF model.
+* This branch is spawned from rtemsjpf-0.6-global-free.
+* This branch will replicate TCB more closely to RTEMS project.
+* This branch deals with attempt to solve nested mutex problem for SMP architecture without using global lock.
 
