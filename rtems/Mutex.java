@@ -173,6 +173,7 @@ there should be no higher priority thread contending on any of the mutex still h
 		RTEMSThread trylockHolder;
 		int preUpdateHolderPriority = holder.currentPriority;
 		int postUdateHolderPriority = -1;
+		boolean success=false;
 		if(USE_MODEL==REC_UPDATE)
 		{
 			updateRecPriority(priority);
@@ -195,8 +196,12 @@ there should be no higher priority thread contending on any of the mutex still h
 			trylockHolder = holder.trylock.holder;
 			synchronized(trylockHolder)
 			{ 
-				reEnqueue();
-				holder.trylock.updatePriority(holder.currentPriority);
+				success = reEnqueue();
+				if(success)
+				{
+					//if not success then holder has been selected as new candidate thread by holder.trylock.holder
+					holder.trylock.updatePriority(holder.currentPriority);
+				}
 				
 			}
 			
@@ -252,13 +257,18 @@ there should be no higher priority thread contending on any of the mutex still h
 				
 	}
 	
-	public void reEnqueue()
+	public boolean reEnqueue()
 	{
 		PriorityQueue<RTEMSThread> pqueue;
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 		pqueue = holder.wait;
-		pqueue.remove(holder);
-		pqueue.offer(holder);
+		if(pqueue.contains(holder)==true)
+		{
+			pqueue.remove(holder);
+			pqueue.offer(holder);	
+			return true;
+		}
+		return false;
 	}
 }
 
