@@ -112,10 +112,9 @@ public class Mutex extends Lock {
 					//----------------------------------->>>waiting here for updaterecpriority to release candidateThr intrinsic locks
 					if(candidateThr != null)
 					{
-					
-						holder = candidateThr;
-						synchronized(holder)
+						synchronized(candidateThr)
 						{
+							holder = candidateThr;
 							assert holder.state==Thread.State.WAITING;
 							holder.state = Thread.State.RUNNABLE;
 							holder.wait = null;
@@ -208,10 +207,12 @@ there should be no higher priority thread contending on any of the mutex still h
 					{
 						//just need to check whether parentThread still has the holder in it. To confirm that poll has not yet happened
 						//i.e holder is not candidate thread choosen by 
-						if(trylockHolder.currentPriority > holder.currentPriority)
-						{
-							holder.trylock.updatePriority(holder.currentPriority);
-						}
+
+						//below condition does not ensure that we will not get problem of priority inversion.
+						//So removing below condition. 
+						
+						holder.trylock.updatePriority(holder.currentPriority);
+						
 					}
 				}
 			
