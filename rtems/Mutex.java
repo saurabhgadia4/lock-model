@@ -192,29 +192,13 @@ there should be no higher priority thread contending on any of the mutex still h
 		if((holder.wait!=null) &&(preUpdateHolderPriority!=postUdateHolderPriority)){ 
 			
 			assert holder.trylock!=null;
-			//no need to do synchronized(holder.trylock) as parentthread can't change as holder can no more be set
-			//but other threads may also waiting on holer.trylock and we can expect the same movements from them.
-			//so need to gain access to holder.trylock.
-				//We need to oncce again check whether holder.trylock==NULL 
-				if(holder.trylock!=null)
-				{
-
-					reEnqueue();
-					//as we have the lock over holder and parentthread is waiting for this lock to get released.
-					//or parentThread cannot change
-					trylockHolder = holder.trylock.holder;
-					synchronized(trylockHolder)
-					{
-						//just need to check whether parentThread still has the holder in it. To confirm that poll has not yet happened
-						//i.e holder is not candidate thread choosen by 
-
-						//below condition does not ensure that we will not get problem of priority inversion.
-						//So removing below condition. 
-						
-						holder.trylock.updatePriority(holder.currentPriority);
-						
-					}
-				}
+			trylockHolder = holder.trylock.holder;
+			synchronized(trylockHolder)
+			{ 
+				reEnqueue();
+				holder.trylock.updatePriority(holder.currentPriority);
+				
+			}
 			
 		}
 
@@ -239,26 +223,32 @@ there should be no higher priority thread contending on any of the mutex still h
 		assert this.holder!=null;	
 		assert this.holder!= thisThread;	
 		//Assertion check
-		assert mutexIdx!=-1;
-		for(i=mutexIdx-1;i>=0;i--)
+		//assert mutexIdx!=-1;
+		if(!(mutexIdx==-1))
 		{
-			candidate = holder.mutexOrderList.get(i);
-			if(candidate.priorityBefore < priority){
-				stopflag = 1;
-				break;
-			}
-			candidate.priorityBefore = priority;	
-			
-		}
-		if(stopflag==0)
-		{
-			if(holder.currentPriority > priority)
+			//This case will happen when thread calls unlock and pops the mutex but didn't got the chance to reassign the 
+			//newholder
+			for(i=mutexIdx-1;i>=0;i--)
 			{
-				holder.currentPriority = priority;
-				holder.setPriority(priority);	
-			}	
+				candidate = holder.mutexOrderList.get(i);
+				if(candidate.priorityBefore < priority){
+					stopflag = 1;
+					break;
+				}
+				candidate.priorityBefore = priority;	
 				
+			}
+			if(stopflag==0)
+			{
+				if(holder.currentPriority > priority)
+				{
+					holder.currentPriority = priority;
+					holder.setPriority(priority);	
+				}	
+					
+			}
 		}
+		
 				
 	}
 	
