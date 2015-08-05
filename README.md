@@ -9,11 +9,6 @@
 
 == Branch Objective ==
 
-* This branch deals with attempt to remove biglock from JPF model.
-* This branch is spawned from rtemsjpf-0.6-global-free.
-* This branch will replicate TCB more closely to RTEMS project.
-* This branch deals with attempt to solve nested mutex problem for SMP architecture without using global lock.
-* It is spawned from rtemsjpf-0.6-b1 on which test cases with configuration 01-01-12, 01-01-21 and 01-02-12 were failing.
-* Motivation for this branch was to pass test cases which failed on rtemsjpf-0.6-b1.
-* At last this branch successfully passes above test cases.
-* We still need test all "good" testcases again to validate this branch.
+* This is a sub-branch of rtemsjpf-0.6-b2
+* This branch demonstrates the solution for nested mutex problem in RTEMS targetted for uniprocessor implementation.
+* Instead of using global lock we are using Verify.beginAtomic and Verify.endAtomic JPF modules to enforce disable_preemption behavior of RTEMS.
