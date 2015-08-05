@@ -1,11 +1,11 @@
 package rtems;
-import base.Lock;
-import base.Condition;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Iterator;
+import java.util.concurrent.locks.*;
+import gov.nasa.jpf.vm.Verify;
 
-public class Mutex extends Lock {
+public class Mutex extends base.Lock {
 	RTEMSThread holder;
 	int id;
 	int nestCount;
@@ -15,6 +15,8 @@ public class Mutex extends Lock {
 	public static final int REC_UPDATE = 1;
   	public static final int NONREC_UPDATE = 0;
 	public static int USE_MODEL=NONREC_UPDATE;
+	public Lock wq_lock = new ReentrantLock();
+	public Condition wq_c1 = wq_lock.newCondition();
 
 
 	public Mutex(int idx){
@@ -31,33 +33,30 @@ public class Mutex extends Lock {
 	}
 
 	public void lock() {
-		synchronized(this)
-		{
+		wq_lock.lock();
 			RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-
+			Verify.beginAtomic();
 			while((holder!=null) && (holder!=thisThread))
 			{
 					
-					try{
-						synchronized(thisThread)
-						{
-							synchronized(holder)
-							{
-								assert (thisThread.currentPriority == thisThread.getPriority());
-								thisThread.state = Thread.State.WAITING;
-								updatePriority(thisThread.currentPriority);
-								if(waitQueue.contains(thisThread)==false){
-									System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
-									waitQueue.offer(thisThread);
-								}
-								thisThread.wait = waitQueue;
-								thisThread.trylock = this;
-							}
-						}
-						wait();
+				try{
+					assert (thisThread.currentPriority == thisThread.getPriority());
+					wq_lock.unlock();
+					updatePriority(thisThread.currentPriority);
+					wq_lock.lock();
+					thisThread.state = Thread.State.WAITING;
+					if(waitQueue.contains(thisThread)==false){
+						System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+						waitQueue.offer(thisThread);
+					}
+					thisThread.wait = waitQueue;
+					thisThread.trylock = this;
+					wq_lock.unlock();
+					Verify.endAtomic();
+					wq_c1.await();
 
-						}catch (InterruptedException e) 
-					{}
+					}catch (InterruptedException e) {}
+					
 				
 			}
 			assert thisThread.getState() != Thread.State.WAITING;
@@ -72,7 +71,8 @@ public class Mutex extends Lock {
 			}
 			nestCount++;
 			thisThread.resourceCount++;
-		}
+			wq_lock.unlock();
+		
 	}
 
 	public void unlock() {
@@ -169,8 +169,8 @@ there should be no higher priority thread contending on any of the mutex still h
 
 	public void updatePriority(int priority)
 	{
-
 		RTEMSThread trylockHolder;
+		holder.current_lock.lock();
 		int preUpdateHolderPriority = holder.currentPriority;
 		int postUdateHolderPriority = -1;
 		boolean success=false;
@@ -194,18 +194,14 @@ there should be no higher priority thread contending on any of the mutex still h
 			
 			assert holder.trylock!=null;
 			trylockHolder = holder.trylock.holder;
-			synchronized(trylockHolder)
-			{ 
-				success = reEnqueue();
-				if(success)
-				{
-					//if not success then holder has been selected as new candidate thread by holder.trylock.holder
-					holder.trylock.updatePriority(holder.currentPriority);
-				}
-				
-			}
-			
+			success = reEnqueue();
+			if(success)
+			{
+				//if not success then holder has been selected as new candidate thread by holder.trylock.holder
+				holder.trylock.updatePriority(holder.currentPriority);
+			}	
 		}
+		holder.current_lock.unlock();
 
 	}
 
