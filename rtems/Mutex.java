@@ -4,6 +4,7 @@ import base.Condition;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Iterator;
+import gov.nasa.jpf.vm.Verify;
 
 public class Mutex extends Lock {
 	RTEMSThread holder;
@@ -39,10 +40,7 @@ public class Mutex extends Lock {
 			{
 					
 					try{
-						synchronized(thisThread)
-						{
-							synchronized(holder)
-							{
+							Verify.beginAtomic();
 								assert (thisThread.currentPriority == thisThread.getPriority());
 								thisThread.state = Thread.State.WAITING;
 								updatePriority(thisThread.currentPriority);
@@ -52,8 +50,7 @@ public class Mutex extends Lock {
 								}
 								thisThread.wait = waitQueue;
 								thisThread.trylock = this;
-							}
-						}
+							Verify.endAtomic();
 						wait();
 
 						}catch (InterruptedException e) 
@@ -63,12 +60,11 @@ public class Mutex extends Lock {
 			assert thisThread.getState() != Thread.State.WAITING;
 			if(holder==null)
 			{
-				synchronized(thisThread)
-				{
-					holder = thisThread;
-					holder.pushMutex(this);
-					assert nestCount==0;
-				}
+				
+				holder = thisThread;
+				holder.pushMutex(this);
+				assert nestCount==0;
+				
 			}
 			nestCount++;
 			thisThread.resourceCount++;
@@ -90,45 +86,34 @@ public class Mutex extends Lock {
 			thisThread.resourceCount--;
 			if(nestCount==0)
 			{
-					synchronized(thisThread)
-					{
-						topMutex = thisThread.mutexOrderList.get(0);
-						assert this==topMutex;		
-						topMutex = thisThread.mutexOrderList.remove(0);
-						thisThread.setPriority(priorityBefore);
-						thisThread.currentPriority = priorityBefore;	
-					
-						assert holder!=null;
-						assert holder.wait==null;
-						assert holder.trylock==null;
-						candidateThr = waitQueue.poll(); 
-						//holder = waitQueue.poll();			
-					}
-					//candidateThr just can't get modified here as it is waiting. Only its priority can be changed
-					//which we should not worry as itself it is at top of waitqueue and its priority can just go high
-					//so we are good.
-					//At this point candidate still has reference to parent thread i.e holder of this mutex as
-					//we have not yet changed holder.
-					//----------------------------------->>>waiting here for updaterecpriority to release candidateThr intrinsic locks
-					if(candidateThr != null)
-					{
-						synchronized(candidateThr)
-						{
-							holder = candidateThr;
-							assert holder.state==Thread.State.WAITING;
-							holder.state = Thread.State.RUNNABLE;
-							holder.wait = null;
-							holder.trylock = null;
-							holder.pushMutex(this);	
-						}
-						
-						notifyAll();							
-					
-					}
-					else
-					{
-						holder = null;
-					}
+				Verify.beginAtomic();
+				topMutex = thisThread.mutexOrderList.get(0);
+				assert this==topMutex;		
+				topMutex = thisThread.mutexOrderList.remove(0);
+				thisThread.setPriority(priorityBefore);
+				thisThread.currentPriority = priorityBefore;	
+			
+				assert holder!=null;
+				assert holder.wait==null;
+				assert holder.trylock==null;
+				holder = waitQueue.poll();			
+				Verify.endAtomic();
+
+				if(holder != null)
+				{
+					assert holder.state==Thread.State.WAITING;
+					holder.state = Thread.State.RUNNABLE;
+					holder.wait = null;
+					holder.trylock = null;
+					holder.pushMutex(this);	
+				
+					notifyAll();							
+				
+				}
+				else
+				{
+					holder = null;
+				}
 			
 			}
 			validator();
@@ -194,15 +179,12 @@ there should be no higher priority thread contending on any of the mutex still h
 			
 			assert holder.trylock!=null;
 			trylockHolder = holder.trylock.holder;
-			synchronized(trylockHolder)
-			{ 
-				success = reEnqueue();
-				if(success)
-				{
-					//if not success then holder has been selected as new candidate thread by holder.trylock.holder
-					holder.trylock.updatePriority(holder.currentPriority);
-				}
-				
+
+			success = reEnqueue();
+			if(success)
+			{
+				//if not success then holder has been selected as new candidate thread by holder.trylock.holder
+				holder.trylock.updatePriority(holder.currentPriority);
 			}
 			
 		}
