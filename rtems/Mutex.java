@@ -230,6 +230,8 @@ public class Mutex extends Lock {
 			
 			assert holder.trylock!=null;
 			trylockHolder = holder.trylock.holder;
+			assert(trylockHolder != Thread.currentThread());
+			// cyclic lock dep. -> deadlock
 			synchronized(trylockHolder)
 			{ 
 				success = reEnqueue();
