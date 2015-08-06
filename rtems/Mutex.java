@@ -194,6 +194,8 @@ there should be no higher priority thread contending on any of the mutex still h
 			
 			assert holder.trylock!=null;
 			trylockHolder = holder.trylock.holder;
+			assert(trylockHolder != Thread.currentThread());
+			// cyclic lock dep. -> deadlock
 			synchronized(trylockHolder)
 			{ 
 				success = reEnqueue();
