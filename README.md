@@ -10,5 +10,7 @@
 == Branch Objective ==
 
 * This is a sub-branch of rtemsjpf-0.6-b2
-* This branch demonstrates the solution for nested mutex problem in RTEMS targetted for uniprocessor implementation.
+* This implementation is only for uniprocessor targets running RTEMS.
+* It implements the solution for priority inversion problem caused by priority inheritance discipline of mutex in RTEMS.
 * Instead of using global lock we are using Verify.beginAtomic and Verify.endAtomic JPF modules to enforce disable_preemption behavior of RTEMS.
+* This is the final model for uniprocessor target.
