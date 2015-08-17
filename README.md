@@ -9,11 +9,12 @@
 
 == Branch Objective ==
 
-* This branch deals with attempt to remove biglock from JPF model.
-* This branch is spawned from rtemsjpf-0.6-global-free.
-* This branch will replicate TCB more closely to RTEMS project.
-* This branch deals with attempt to solve nested mutex problem for SMP architecture without using global lock.
+* This branch implements solution for priority inversion problem by removing global lock over mutex class for SMP
+  architecture.
 * It is spawned from rtemsjpf-0.6-b1 on which test cases with configuration 01-01-12, 01-01-21 and 01-02-12 were failing.
-* Motivation for this branch was to pass test cases which failed on rtemsjpf-0.6-b1.
-* At last this branch successfully passes above test cases.
-* We still need test all "good" testcases again to validate this branch.
+
+== Branch Status ==
+
+* We were successfull in removing global lock and passing the test cases which were failing on rtemsjpf-0.6-b1.
+* This branch passes all the test cases present in good set of testcases.
+* This is the final branch for SMP architecture.
