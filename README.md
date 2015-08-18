@@ -9,14 +9,14 @@
 
 == Branch Objective ==
 
-* This branch implements solution for priority inversion problem by removing global lock over mutex class for uniprocessor architecture.
-* It is spawned from rtemsjpf-0.6-b2 and further developed.
+* This branch implements solution for priority inversion problem for uniprocessor as well as SMP architecture with the help of global lock over mutex class.
+* It is spawned from uniproc-new1 and further developed.
 
 == Branch Status ==
 
-* We were successfull in developing a global lock free solution for the problem.
+* We were successfull in developing solution for priority inversion problem for both uniprocessor as well as SMP architecture.
 * This branch passes all the test cases present in good set of testcases.
-* This is the final branch for uniprocessor architecture.
+* This is the final branch for global lock solution.
 
 == Test Case Description ==
 
