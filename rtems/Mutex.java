@@ -18,6 +18,7 @@ public class Mutex extends Lock {
 	PriorityQueue<RTEMSThread> waitQueue = 
 		new PriorityQueue<RTEMSThread>(7, comparator); /*! It is the waiting 
 	 	queue for the blocked threads based on priorities of the thread.*/
+	static Object globalLock = new Object(); /*! models kernel-wide lock*/
 	public static final int REC_UPDATE = 1; /*! This model solves the problem
 	 	of priority inversion*/
   	public static final int NONREC_UPDATE = 0; /*! This model reproduces RTEMS 
@@ -59,7 +60,7 @@ public class Mutex extends Lock {
 	*
 	*/
 	public void lock() {
-		synchronized(this)
+		synchronized(globalLock)
 		{
 			RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 
@@ -67,17 +68,16 @@ public class Mutex extends Lock {
 			{
 					
 					try{
-							Verify.beginAtomic();
-								assert (thisThread.currentPriority == thisThread.getPriority());
-								thisThread.state = Thread.State.WAITING;
-								updatePriority(thisThread.currentPriority);
-								if(waitQueue.contains(thisThread)==false){
-									System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
-									waitQueue.offer(thisThread);
-								}
-								thisThread.wait = waitQueue;
-								thisThread.trylock = this;
-							Verify.endAtomic();
+							
+						assert (thisThread.currentPriority == thisThread.getPriority());
+						thisThread.state = Thread.State.WAITING;
+						updatePriority(thisThread.currentPriority);
+						if(waitQueue.contains(thisThread)==false){
+							System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+							waitQueue.offer(thisThread);
+						}
+						thisThread.wait = waitQueue;
+						thisThread.trylock = this;
 						wait();
 
 						}catch (InterruptedException e) 
@@ -112,7 +112,7 @@ public class Mutex extends Lock {
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 		RTEMSThread candidateThr;
 		int stepdownPri;
-		synchronized(this)            //trylock
+		synchronized(globalLock)            //trylock
 		{
 
 
@@ -122,7 +122,6 @@ public class Mutex extends Lock {
 			thisThread.resourceCount--;
 			if(nestCount==0)
 			{
-				Verify.beginAtomic();
 				topMutex = thisThread.mutexOrderList.get(0);
 				assert this==topMutex;		
 				topMutex = thisThread.mutexOrderList.remove(0);
@@ -133,8 +132,6 @@ public class Mutex extends Lock {
 				assert holder.wait==null;
 				assert holder.trylock==null;
 				holder = waitQueue.poll();			
-				Verify.endAtomic();
-
 				if(holder != null)
 				{
 					assert holder.state==Thread.State.WAITING;
@@ -168,27 +165,21 @@ public class Mutex extends Lock {
 	public void validator(){
 		RTEMSThread chkThr;
 		Mutex chkMtx;
-		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-		synchronized(this)
+		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();		
+		Iterator<Mutex> mItr = thisThread.mutexOrderList.iterator();
+		while (mItr.hasNext())
 		{
-			Iterator<Mutex> mItr = thisThread.mutexOrderList.iterator();
-			while (mItr.hasNext()){
-				chkMtx = mItr.next();
-				synchronized(chkMtx)
-				{
-					System.out.println("--->Mutex: "+chkMtx.id);
-					chkThr = chkMtx.waitQueue.peek();	
-					
-						if(chkThr!=null)
-						{
-							System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
-							assert (thisThread.getPriority()<=chkThr.getPriority());	
-						}
-				}
-				
-				
+			chkMtx = mItr.next();
+			System.out.println("--->Mutex: "+chkMtx.id);
+			chkThr = chkMtx.waitQueue.peek();		
+			if(chkThr!=null)
+			{
+				System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
+				assert (thisThread.getPriority()<=chkThr.getPriority());	
 			}
+		
 		}
+		
 	}
 
 	/**
