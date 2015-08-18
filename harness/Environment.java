@@ -33,14 +33,12 @@ public class Environment {
 		     prio1);
     t0.start();
     
-    //Creating thread 1 trying to acquire lock 2, lock 0
     RTEMSThread t1 =
       new TestThread(new int[]{(int)(new String(args[1]).charAt(0)) - '0',
 			       (int)(new String(args[1]).charAt(1)) - '0'},
 		     prio2);
     t1.start();
 
-    //creating thread 2 trying to acquire lock1, lock2
     RTEMSThread t2 =
       new TestThread(new int[]{(int)(new String(args[2]).charAt(0)) - '0',
 			       (int)(new String(args[2]).charAt(1)) - '0'},
@@ -54,8 +52,6 @@ public class Environment {
       }catch(InterruptedException e){
         e.printStackTrace();
     }
-
-  
 
   }
 }
