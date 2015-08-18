@@ -78,7 +78,7 @@ public class Mutex extends Lock {
 						}
 						thisThread.wait = waitQueue;
 						thisThread.trylock = this;
-						wait();
+						globalLock.wait();
 
 						}catch (InterruptedException e) 
 					{}
@@ -140,7 +140,7 @@ public class Mutex extends Lock {
 					holder.trylock = null;
 					holder.pushMutex(this);	
 				
-					notifyAll();							
+					globalLock.notifyAll();							
 				
 				}
 				else
