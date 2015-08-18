@@ -7,16 +7,23 @@ import java.util.Iterator;
 import gov.nasa.jpf.vm.Verify;
 
 public class Mutex extends Lock {
-	RTEMSThread holder;
-	int id;
-	int nestCount;
-	int priorityBefore=-1;
-	MyComparator comparator = new MyComparator();
-	PriorityQueue<RTEMSThread> waitQueue = new PriorityQueue<RTEMSThread>(7, comparator);
-	public static final int REC_UPDATE = 1;
-  	public static final int NONREC_UPDATE = 0;
-	public static int USE_MODEL=NONREC_UPDATE;
-
+	RTEMSThread holder; /*! It is the thread holding this mutex*/
+	int id; /*! It is the ID of this mutex*/
+	int nestCount; /*! It records the nesting count for re-entrant locking*/
+	int priorityBefore=-1; /*! Its value is set to current priority of the
+	 	thread when acquiring this mutex. We need this to ensure proper 
+	 	stepping of the priorities*/
+	MyComparator comparator = new MyComparator(); /*! It places waiting thread
+	 	in priorityQueue based on thread priority*/
+	PriorityQueue<RTEMSThread> waitQueue = 
+		new PriorityQueue<RTEMSThread>(7, comparator); /*! It is the waiting 
+	 	queue for the blocked threads based on priorities of the thread.*/
+	public static final int REC_UPDATE = 1; /*! This model solves the problem
+	 	of priority inversion*/
+  	public static final int NONREC_UPDATE = 0; /*! This model reproduces RTEMS 
+  		problem of priority inversion for priority inheritance discipline*/
+	public static int USE_MODEL=NONREC_UPDATE; /*! Indicates the current model
+	 	of execution of process*/
 
 	public Mutex(int idx){
 
@@ -26,11 +33,31 @@ public class Mutex extends Lock {
 		this.holder=null;
 	}
 
+	/**
+	* Brief It selects the model for execution of program.
+	*
+	* @param[in] method We update the priorities based on method.
+	* For now there are only 3 methods Recursive and Non-Recursive. 
+	* Recursive model addresses the problem of priority inversion and
+	* Non-Recursive model is the default RTEMS model to show that there
+	* exists priority inversion problem.
+	*/
 	public static void setUpdateMethod(int method)
 	{
 		USE_MODEL = method;
 	}
 
+	/**
+	* Brief It is the routine to acquire mutex.
+	*
+	* Executing thread calls this routine to acquire the mutex. If mutex is 
+	* available then it is handed over to thread and the mutex object is 
+	* pushed to the thread's mutexOrderList. Current priority of the
+	* thread is stored in priorityBefore of the mutex to ensure proper step-
+	* down of the priority at the time of release of the mutex. If the mutex is 
+	* already blocked then the thread is pushed to waiting Queue of this mutex.
+	*
+	*/
 	public void lock() {
 		synchronized(this)
 		{
@@ -71,6 +98,15 @@ public class Mutex extends Lock {
 		}
 	}
 
+	/**
+	* Brief This routine releases mutex.
+	* 
+	* On release of mutex, we properly set the current priority of thread
+	* releasing the mutex. If there are more thread waiting, then top
+	* waiting priority thread is set as the new holder of the mutex and is
+	* notified.
+	*
+	*/
 	public void unlock() {
 		Mutex topMutex=null;
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
@@ -121,11 +157,14 @@ public class Mutex extends Lock {
 					
 	}
 
-/*
-Validator function checks that after stepping down the priority, on unlock() operation, 
-there should be no higher priority thread contending on any of the mutex still held by holder. 
-*/
-
+	/**
+	* Brief It validates whether there exists priority inversion in system.
+	*
+	* This is routine is coupled with unlock to ensure that on release of
+	* mutex there is proper stepping of priority of releasing thread. 
+	* If there exists priority inversion then program will stop with
+	* giving assertion error.
+	*/
 	public void validator(){
 		RTEMSThread chkThr;
 		Mutex chkMtx;
@@ -152,6 +191,12 @@ there should be no higher priority thread contending on any of the mutex still h
 		}
 	}
 
+	/**
+	* Brief It updates the priority of holder thread if required.
+	* 
+	* It calls specific update procefure based on the set method
+	* (recursive or non-recursive).
+	*/
 	public void updatePriority(int priority)
 	{
 
@@ -191,6 +236,12 @@ there should be no higher priority thread contending on any of the mutex still h
 
 	}
 
+	/**
+	* Brief It just updates current priority of holder thread.
+	* 
+	* It updates current priority of the holder thread if it is
+    * less than executing thread trying to acquire this mutex.
+	*/
 	public void updateNonRecPriority(int priority)
 	{
 		if(holder.currentPriority > priority){
@@ -200,6 +251,14 @@ there should be no higher priority thread contending on any of the mutex still h
 
 	}
 
+	/**
+	* Brief It updates priority recursively.
+	* 
+	* It goes through the list of acquired mutex by the holder thread,
+	* from the current mutex index to the topmost mutex in the list and
+	* checks whether there is need to change the priorityBefore of the 
+	* acquired mutex by the holder thread.
+	*/
 	public void updateRecPriority(int priority)
 	{
 		int i;
@@ -239,6 +298,14 @@ there should be no higher priority thread contending on any of the mutex still h
 				
 	}
 	
+	/**
+	* Brief This routine is re-enqueue's the holder thread waiting 
+	* on any mutex.
+	*
+	* If executing thread promotes current priority of the holder thread
+	* and if holder thread is waiting on someother mutex then we update the 
+	* position of holder thread in waitqueue based on new current priority.
+	*/
 	public boolean reEnqueue()
 	{
 		PriorityQueue<RTEMSThread> pqueue;
