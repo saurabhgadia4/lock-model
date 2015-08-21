@@ -65,21 +65,20 @@ public class Mutex extends Lock {
 			while((holder!=null) && (holder!=thisThread))
 			{
 					try{
-						synchronized(thisThread)
+						
+						synchronized(holder)
 						{
-							synchronized(holder)
-							{
-								assert (thisThread.currentPriority == thisThread.getPriority());
-								thisThread.state = Thread.State.WAITING;
-								updatePriority(thisThread.currentPriority);
-								if(waitQueue.contains(thisThread)==false){
-									System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
-									waitQueue.offer(thisThread);
-								}
-								thisThread.wait = waitQueue;
-								thisThread.trylock = this;
+							assert (thisThread.currentPriority == thisThread.getPriority());
+							thisThread.state = Thread.State.WAITING;
+							updatePriority(thisThread.currentPriority);
+							if(waitQueue.contains(thisThread)==false){
+								System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
+								waitQueue.offer(thisThread);
 							}
+							thisThread.wait = waitQueue;
+							thisThread.trylock = this;
 						}
+					
 						wait();
 
 						}catch (InterruptedException e) 

@@ -9,15 +9,11 @@
 
 == Branch Objective ==
 
-* This branch implements solution for priority inversion problem by removing global lock over mutex class for SMP
-  architecture.
-* It is spawned from rtemsjpf-0.6-b1 on which test cases with configuration 01-01-12, 01-01-21 and 01-02-12 were failing.
+* It is spawned from rtemsjpf-0.6-b2 be removing lock over executing thread in lock() when mutex is not available.
+* Want to find out which test cases fail in such case.
 
 == Branch Status ==
 
-* We were successfull in removing global lock and passing the test cases which were failing on rtemsjpf-0.6-b1.
-* This branch passes all the test cases present in good set of testcases.
-* This is the final branch for SMP architecture.
 
 == Test Case Description ==
 
