@@ -89,12 +89,11 @@ public class Mutex extends Lock {
 			assert thisThread.getState() != Thread.State.WAITING;
 			if(holder==null)
 			{
-				synchronized(thisThread)
-				{
-					holder = thisThread;
-					holder.pushMutex(this);
-					assert nestCount==0;
-				}
+
+				holder = thisThread;
+				holder.pushMutex(this);
+				
+				assert nestCount==0;	
 			}
 			nestCount++;
 			thisThread.resourceCount++;
