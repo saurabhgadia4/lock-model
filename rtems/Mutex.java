@@ -61,6 +61,7 @@ public class Mutex extends Lock {
 		synchronized(this)
 		{
 			RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+			thisThread.lockSet.addLock(this);
 
 			while((holder!=null) && (holder!=thisThread))
 			{
@@ -68,6 +69,7 @@ public class Mutex extends Lock {
 						
 						synchronized(holder)
 						{
+							thisThread.lockSet.addLock(holder);
 							assert (thisThread.currentPriority == thisThread.getPriority());
 							thisThread.state = Thread.State.WAITING;
 							updatePriority(thisThread.currentPriority);
@@ -77,6 +79,7 @@ public class Mutex extends Lock {
 							}
 							thisThread.setWait(waitQueue);
 							thisThread.trylock = this;
+							thisThread.lockSet.removeLock(holder);
 						}
 					
 						wait();
@@ -90,13 +93,16 @@ public class Mutex extends Lock {
 			{
 				synchronized(thisThread)
 				{
+					thisThread.lockSet.addLock(thisThread);
 					holder = thisThread;
 					holder.pushMutex(this);
 					assert nestCount==0;
+					thisThread.lockSet.removeLock(thisThread);
 				}
 			}
 			nestCount++;
 			thisThread.resourceCount++;
+			thisThread.lockSet.removeLock(this);
 		}
 	}
 
@@ -116,6 +122,7 @@ public class Mutex extends Lock {
 		int stepdownPri;
 		synchronized(this)
 		{
+			thisThread.lockSet.addLock(this);
 			assert nestCount>0;
 			assert thisThread.resourceCount>0;
 			nestCount--;
@@ -124,6 +131,7 @@ public class Mutex extends Lock {
 			{
 					synchronized(thisThread)
 					{
+						thisThread.lockSet.addLock(thisThread);
 						topMutex = thisThread.mutexOrderList.get(0);
 						assert this==topMutex;		
 						topMutex = thisThread.mutexOrderList.remove(0);
@@ -135,6 +143,7 @@ public class Mutex extends Lock {
 						assert holder.trylock==null;
 						candidateThr = waitQueue.poll(); 
 						//holder = waitQueue.poll();			
+						thisThread.lockSet.removeLock(thisThread);
 					}
 					//candidateThr just can't get modified here as it is waiting. Only its priority can be changed
 					//which we should not worry as itself it is at top of waitqueue and its priority can just go high
@@ -146,12 +155,14 @@ public class Mutex extends Lock {
 					{
 						synchronized(candidateThr)
 						{
+							thisThread.lockSet.addLock(candidateThr);
 							holder = candidateThr;
 							assert holder.state==Thread.State.WAITING;
 							holder.state = Thread.State.RUNNABLE;
 							holder.setWait(null);
 							holder.trylock = null;
 							holder.pushMutex(this);	
+							thisThread.lockSet.removeLock(candidateThr);
 						}
 						
 						notifyAll();							
@@ -164,6 +175,7 @@ public class Mutex extends Lock {
 			
 			}
 			validator();
+			thisThread.lockSet.removeLock(this);
 		}
 					
 	}
@@ -183,11 +195,13 @@ public class Mutex extends Lock {
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 		synchronized(this)
 		{
+			thisThread.lockSet.addLock(this);
 			Iterator<Mutex> mItr = thisThread.mutexOrderList.iterator();
 			while (mItr.hasNext()){
 				chkMtx = mItr.next();
 				synchronized(chkMtx)
 				{
+					thisThread.lockSet.addLock(chkMtx);
 					System.out.println("--->Mutex: "+chkMtx.id);
 					chkThr = chkMtx.waitQueue.peek();	
 					
@@ -196,9 +210,11 @@ public class Mutex extends Lock {
 							System.out.println("------>Thread-id: "+ chkThr.getId()+" priority: "+ chkThr.getPriority());
 							assert (thisThread.getPriority()<=chkThr.getPriority());	
 						}
+					thisThread.lockSet.removeLock(chkMtx);
 				}
 				
 			}
+			thisThread.lockSet.removeLock(this);
 		}
 	}
 
@@ -233,13 +249,15 @@ public class Mutex extends Lock {
 			// cyclic lock dep. -> deadlock
 			synchronized(trylockHolder)
 			{ 
+				RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+				thisThread.lockSet.addLock(trylockHolder);
 				success = reEnqueue();
 				if(success)
 				{
 					//if not success then holder has been selected as new candidate thread by holder.trylock.holder
 					holder.trylock.updatePriority(holder.currentPriority);
 				}
-				
+				thisThread.lockSet.removeLock(trylockHolder);
 			}
 			
 		}

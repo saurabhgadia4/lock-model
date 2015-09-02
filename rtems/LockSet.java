@@ -13,6 +13,7 @@ public class LockSet {
 			locks.add(lock);
 			idx = locks.size() - 1;
 		}
+		assert (idx < 32);
 		return idx;
 	}
 

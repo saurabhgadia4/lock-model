@@ -18,6 +18,8 @@ public class RTEMSThread extends Thread {
 		mutex by the thread by the course of time*/
 	public Mutex trylock; /*! References to mutex on which this thread is
 		blocked*/
+
+	public LockSet lockSet = new LockSet();
 	
 	/**
 	* @brief Initializes thread object.
