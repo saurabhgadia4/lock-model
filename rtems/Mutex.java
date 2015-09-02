@@ -61,7 +61,7 @@ public class Mutex extends Lock {
 		synchronized(this)
 		{
 			RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-			thisThread.lockSet.addLock(this, id + ": lock: this");
+			thisThread.lockSet.addLock(this, "lock: this (mutex id = " + id + ")");
 
 			while((holder!=null) && (holder!=thisThread))
 			{
@@ -69,7 +69,7 @@ public class Mutex extends Lock {
 						
 						synchronized(holder)
 						{
-							thisThread.lockSet.addLock(holder , id + ": lock: holder");
+							thisThread.lockSet.addLock(holder , "lock: holder (thread id = " + holder.getId() + ")");
 							assert (thisThread.currentPriority == thisThread.getPriority());
 							thisThread.state = Thread.State.WAITING;
 							updatePriority(thisThread.currentPriority);
@@ -93,7 +93,7 @@ public class Mutex extends Lock {
 			{
 				synchronized(thisThread)
 				{
-					thisThread.lockSet.addLock(thisThread, id + ": lock: thisThread");
+					thisThread.lockSet.addLock(thisThread, "lock: thisThread (thread id = " + thisThread.getId() + ")");
 					holder = thisThread;
 					holder.pushMutex(this);
 					assert nestCount==0;
@@ -122,7 +122,7 @@ public class Mutex extends Lock {
 		int stepdownPri;
 		synchronized(this)
 		{
-			thisThread.lockSet.addLock(this, id + ": unlock: this");
+			thisThread.lockSet.addLock(this, "unlock: this (mutex id = " + id + ")");
 			assert nestCount>0;
 			assert thisThread.resourceCount>0;
 			nestCount--;
@@ -131,7 +131,7 @@ public class Mutex extends Lock {
 			{
 					synchronized(thisThread)
 					{
-						thisThread.lockSet.addLock(thisThread, id + ": unlock: thisThread");
+						thisThread.lockSet.addLock(thisThread, "unlock: thisThread (thread id = " + thisThread.getId() + ")");
 						topMutex = thisThread.mutexOrderList.get(0);
 						assert this==topMutex;		
 						topMutex = thisThread.mutexOrderList.remove(0);
@@ -155,7 +155,7 @@ public class Mutex extends Lock {
 					{
 						synchronized(candidateThr)
 						{
-							thisThread.lockSet.addLock(candidateThr, id + ": unlock: candidateThr");
+							thisThread.lockSet.addLock(candidateThr, "unlock: candidateThr (thread id = " + candidateThr.getId() + ")");
 							holder = candidateThr;
 							assert holder.state==Thread.State.WAITING;
 							holder.state = Thread.State.RUNNABLE;
@@ -195,13 +195,13 @@ public class Mutex extends Lock {
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
 		synchronized(this)
 		{
-			thisThread.lockSet.addLock(this, id + ": validator: this");
+			thisThread.lockSet.addLock(this, "validator: this (mutex id = " + id + ")");
 			Iterator<Mutex> mItr = thisThread.mutexOrderList.iterator();
 			while (mItr.hasNext()){
 				chkMtx = mItr.next();
 				synchronized(chkMtx)
 				{
-					thisThread.lockSet.addLock(chkMtx, id + ": validator: chkMtx");
+					thisThread.lockSet.addLock(chkMtx, "validator: chkMtx (mutex id = " + id + ")");
 					System.out.println("--->Mutex: "+chkMtx.id);
 					chkThr = chkMtx.waitQueue.peek();	
 					
@@ -250,7 +250,7 @@ public class Mutex extends Lock {
 			synchronized(trylockHolder)
 			{ 
 				RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-				thisThread.lockSet.addLock(trylockHolder, id + ": updatePriority: trylockHolder");
+				thisThread.lockSet.addLock(trylockHolder, "updatePriority: trylockHolder (thread id = " + trylockHolder.getId() + ")");
 				success = reEnqueue();
 				if(success)
 				{
