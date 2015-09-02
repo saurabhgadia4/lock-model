@@ -25,7 +25,7 @@ public class LockSet {
 		heldLocks &= ~(2 << getLockID(lock));
 	}
 
-	public int intersect(LockSet that) {
-		return heldLocks & that.heldLocks;
+	public int intersect(int current) {
+		return heldLocks & current;
 	}
 }

@@ -20,6 +20,7 @@ public class RTEMSThread extends Thread {
 		blocked*/
 
 	public LockSet lockSet = new LockSet();
+	public int lockSetForAccessesToWait = -1;
 	
 	/**
 	* @brief Initializes thread object.
@@ -38,11 +39,24 @@ public class RTEMSThread extends Thread {
 		this.trylock = null;
 	}
 
+	private void checkLockSetOnAccess() {
+		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
+		if (lockSetForAccessesToWait == -1) {
+			lockSetForAccessesToWait = thisThread.lockSet.heldLocks;
+		} else {
+			lockSetForAccessesToWait = thisThread.lockSet.intersect(lockSetForAccessesToWait);
+		}
+		System.err.println("Lock set = " + lockSetForAccessesToWait + " after access by Thread " + thisThread.getId());
+		assert(lockSetForAccessesToWait != 0);
+	}
+
 	public void setWait(PriorityQueue<RTEMSThread> waitQ) {
+		checkLockSetOnAccess();
 		wait = waitQ;
 	}
 
 	public PriorityQueue<RTEMSThread> getWait() {
+		checkLockSetOnAccess();
 		return wait;
 	}
 
