@@ -5,24 +5,27 @@ import java.util.ArrayList;
 public class LockSet {
 	public static ArrayList<Object> locks =
 		new ArrayList<Object>(); // to get lock ID
+	public static ArrayList<String> lockDesc = new ArrayList<String>();
 	public int heldLocks = 0; // bit set for 32 locks
 
-	private int getLockID(Object lock) {
+	private int getLockID(Object lock, String description) {
 		int idx = locks.indexOf(lock);
 		if (idx == -1) {
 			locks.add(lock);
+			lockDesc.add(description);
 			idx = locks.size() - 1;
 		}
 		assert (idx < 32);
 		return idx;
 	}
 
-	public void addLock(Object lock) {
-		heldLocks |= (2 << getLockID(lock));
+	public void addLock(Object lock, String description) {
+		int id = getLockID(lock, description);
+		heldLocks |= (2 << id);
 	}
 
 	public void removeLock(Object lock) {
-		heldLocks &= ~(2 << getLockID(lock));
+		heldLocks &= ~(2 << getLockID(lock, null));
 	}
 
 	public int intersect(int current) {
