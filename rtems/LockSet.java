@@ -14,7 +14,8 @@ public class LockSet {
 			locks.add(lock);
 //			lockDesc.add(description);
 			idx = locks.size() - 1;
-			System.out.println("Lock " + idx + " is " + description);
+			System.out.println("Lock " + idx + " (" + (1 << idx) +
+					   ") is " + description);
 		}
 		assert (idx < 32);
 		return idx;
@@ -22,11 +23,11 @@ public class LockSet {
 
 	public void addLock(Object lock, String description) {
 		int id = getLockID(lock, description);
-		heldLocks |= (2 << id);
+		heldLocks |= (1 << id);
 	}
 
 	public void removeLock(Object lock) {
-		heldLocks &= ~(2 << getLockID(lock, null));
+		heldLocks &= ~(1 << getLockID(lock, null));
 	}
 
 	public int intersect(int current) {
