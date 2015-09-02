@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 public class RTEMSThread extends Thread {
-	public PriorityQueue<RTEMSThread> wait; /*! It points to waitqueue of 
+	private PriorityQueue<RTEMSThread> wait; /*! It points to waitqueue of 
 	 	mutex on which this thread is blocked.*/
 	public int resourceCount; /*! It is the count of resources held 
 	 	by this thread. For now just acquired mutex count*/
@@ -34,6 +34,14 @@ public class RTEMSThread extends Thread {
 		this.setPriority(priority);
 		this.currentPriority = this.realPriority = this.getPriority();
 		this.trylock = null;
+	}
+
+	public void setWait(PriorityQueue<RTEMSThread> waitQ) {
+		wait = waitQ;
+	}
+
+	public PriorityQueue<RTEMSThread> getWait() {
+		return wait;
 	}
 
 	/**

@@ -75,7 +75,7 @@ public class Mutex extends Lock {
 								System.out.println("Adding thread :" + thisThread.getId() + " in waitQ of mutex: "+id);
 								waitQueue.offer(thisThread);
 							}
-							thisThread.wait = waitQueue;
+							thisThread.setWait(waitQueue);
 							thisThread.trylock = this;
 						}
 					
@@ -131,7 +131,7 @@ public class Mutex extends Lock {
 						thisThread.currentPriority = priorityBefore;	
 					
 						assert holder!=null;
-						assert holder.wait==null;
+						assert holder.getWait()==null;
 						assert holder.trylock==null;
 						candidateThr = waitQueue.poll(); 
 						//holder = waitQueue.poll();			
@@ -149,7 +149,7 @@ public class Mutex extends Lock {
 							holder = candidateThr;
 							assert holder.state==Thread.State.WAITING;
 							holder.state = Thread.State.RUNNABLE;
-							holder.wait = null;
+							holder.setWait(null);
 							holder.trylock = null;
 							holder.pushMutex(this);	
 						}
@@ -225,7 +225,7 @@ public class Mutex extends Lock {
 		}
 		postUdateHolderPriority = holder.currentPriority;
 		
-		if((holder.wait!=null) &&(preUpdateHolderPriority!=postUdateHolderPriority)){ 
+		if((holder.getWait()!=null) &&(preUpdateHolderPriority!=postUdateHolderPriority)) {
 			
 			assert holder.trylock!=null;
 			trylockHolder = holder.trylock.holder;
@@ -319,7 +319,7 @@ public class Mutex extends Lock {
 	{
 		PriorityQueue<RTEMSThread> pqueue;
 		RTEMSThread thisThread = (RTEMSThread)Thread.currentThread();
-		pqueue = holder.wait;
+		pqueue = holder.getWait();
 		if(pqueue.contains(holder)==true)
 		{
 			pqueue.remove(holder);
