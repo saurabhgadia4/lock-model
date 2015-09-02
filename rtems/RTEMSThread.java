@@ -46,7 +46,10 @@ public class RTEMSThread extends Thread {
 		} else {
 			lockSetForAccessesToWait = thisThread.lockSet.intersect(lockSetForAccessesToWait);
 		}
-		System.err.println("Lock set = " + lockSetForAccessesToWait + " after access by Thread " + thisThread.getId());
+		System.err.println("Lock set for wait of thread " + getId() +
+				   " = " + lockSetForAccessesToWait +
+				   " after access by Thread " +
+				   thisThread.getId());
 		assert(lockSetForAccessesToWait != 0);
 	}
 
