@@ -50,7 +50,10 @@ public class RTEMSThread extends Thread {
 				   " = " + lockSetForAccessesToWait +
 				   " after access by Thread " +
 				   thisThread.getId());
-		assert(lockSetForAccessesToWait != 0);
+		//assert(lockSetForAccessesToWait != 0);
+		if (lockSetForAccessesToWait == 0) {
+			System.err.println("++++ RACE FOUND! ++++");
+		}
 	}
 
 	public void setWait(PriorityQueue<RTEMSThread> waitQ) {
