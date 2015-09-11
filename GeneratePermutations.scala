@@ -42,13 +42,7 @@ object GeneratePermutations {
 
   // sort the string as a combination of strings of length 2
   def sortedLockIDs(in: String, runLength: Int) = {
-    var i = 0
-    val lockStrs = new ListBuffer[String]
-    while (i < in.size) {
-      lockStrs += in.substring(i, i + runLength)
-      i += runLength
-    }
-    new String(lockStrs.toList.sorted.flatten.toArray)
+    new String(in.grouped(runLength).toList.sorted.flatten.toArray)
   }
 
   def isCyclic(elements: List[String]): Boolean = {
