@@ -60,15 +60,15 @@ object GeneratePermutations {
     }
 
     // cycle of length 3
-    for (s0 <- elements) {
-      for (pair0 <- s0.combinations(2)) {
+    for (i <- 0 to elements.size - 1) {
+      for (pair0 <- elements(i).combinations(2)) {
 	if (pair0.charAt(0) != pair0.charAt(1)) {
-	  for (s1 <- elements) {
-	    for (pair1 <- s1.combinations(2)) {
+	  for (j <- i + 1 to elements.size - 1) {
+	    for (pair1 <- elements(j).combinations(2)) {
 	      if (pair1.charAt(0) != pair1.charAt(1) &&
 		  pair1.charAt(0) == pair0.charAt(1)) {
-		for (s2 <- elements) {
-		  for (pair2 <- s2.combinations(2)) {
+		for (k <- j + 1 to elements.size - 1) {
+		  for (pair2 <- elements(k).combinations(2)) {
 		    if (pair2.charAt(0) != pair2.charAt(1) &&
 			pair2.charAt(0) == pair1.charAt(1) &&
 			pair0.charAt(0) == pair2.charAt(1)) {
