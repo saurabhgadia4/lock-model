@@ -47,10 +47,14 @@ object GeneratePermutations {
 
   def isCyclic(elements: List[String]): Boolean = {
     // cycle of length 2
-    for (e <- elements) {
-      for (pair <- e.combinations(2)) {
-	if (pair.charAt(0) != pair.charAt(1) && elements.contains(pair.reverse)) {
-	  return true
+    for (i <- 0 to elements.size - 1) {
+      for (pair <- elements(i).combinations(2)) {
+	if (pair.charAt(0) != pair.charAt(1)) {
+	  for (j <- i + 1 to elements.size - 1) {
+	    if (elements(j).contains(pair.reverse)) {
+	      return true
+	    }
+	  }
 	}
       }
     }
