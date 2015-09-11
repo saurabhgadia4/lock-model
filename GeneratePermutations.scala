@@ -75,6 +75,7 @@ object GeneratePermutations {
   def main(args: Array[String]) {
     val locks = List("0", "1", "2")
     val n = 6
+    val locksPerThread = 2
     val allChoices =
       Iterable.fill(n)(locks) reduceLeft { (a, b) =>
         for(a<-a;b<-b) yield a+b
@@ -87,7 +88,8 @@ object GeneratePermutations {
     // remove isomorphic strings by attempting to match renamings
     val results = new HashSet[String]
     for (choice <- allChoices) {
-      val iso = generateIso(choice).map(s => sortedLockIDs(s, 2)).distinct
+      val iso =
+	generateIso(choice).map(s => sortedLockIDs(s, locksPerThread)).distinct
       if (!found(iso, results)) {
 	results += choice
       }
@@ -95,7 +97,7 @@ object GeneratePermutations {
 
     val bad = new HashSet[String]
     for (s <- results.toList) {
-      val elements = List(s.substring(0, 2), s.substring(2, 4), s.substring( 4,6))
+      val elements = s.grouped(locksPerThread).toList
       if (isCyclic(elements)) {
 	bad += s
       }
