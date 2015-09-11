@@ -7,6 +7,10 @@ import scala.collection.mutable.ListBuffer
    We exploit the fact that the two-character subsequences
    represent lock choices of each thread, whose order does not matter. */
 
+// prints cyclic configurations to stderr, non-cyclic ones to stdout
+// (cycle detection up to length 3)
+// Usage: scala GeneratePermutations > good 2> bad
+
 object GeneratePermutations {
   val Charset = "012"
   val Perms = Charset.toCharArray.toList.permutations.toList
@@ -40,6 +44,33 @@ object GeneratePermutations {
   def sortedLockIDs(in: String) =
     new String(List(in.substring(0, 2), in.substring(2, 4), in.substring(4, 6)).sorted.flatten.toArray)
 
+  def isCyclic(elements: List[String]): Boolean = {
+    // cycle of length 2
+    for (e <- elements) {
+      if (e.charAt(0) != e.charAt(1) && elements.contains(e.reverse)) {
+	return true
+      }
+    }
+
+    // cycle of length 3
+    val s0 = elements(0)
+    if (s0.charAt(0) != s0.charAt(1)) {
+      for (s1 <- elements) {
+	if (s1.charAt(0) != s1.charAt(1) && s1.charAt(0) == s0.charAt(1)) {
+	  for (s2 <- elements) {
+	    if (s2.charAt(0) != s2.charAt(1) && s2.charAt(0) == s1.charAt(1)
+		&& s0.charAt(0) == s2.charAt(1)) {
+	      return true
+	    }
+	  }
+	}
+      }
+    }
+
+    // no cycle
+    return false
+  }
+
   def main(args: Array[String]) {
     val locks = List("0", "1", "2")
     val n = 6
@@ -61,7 +92,19 @@ object GeneratePermutations {
       }
     }
 
-    for (choice <- results.toList.sorted) {
+    val bad = new HashSet[String]
+    for (s <- results.toList) {
+      val elements = List(s.substring(0, 2), s.substring(2, 4), s.substring( 4,6))
+      if (isCyclic(elements)) {
+	bad += s
+      }
+    }
+
+    for (s <- bad.toList.sorted) {
+      Console.err.println(s)
+    }
+
+    for (choice <- (results diff bad).toList.sorted) {
       Console.out.println(choice)
     }
   }
