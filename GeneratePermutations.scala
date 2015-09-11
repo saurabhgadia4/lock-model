@@ -48,20 +48,31 @@ object GeneratePermutations {
   def isCyclic(elements: List[String]): Boolean = {
     // cycle of length 2
     for (e <- elements) {
-      if (e.charAt(0) != e.charAt(1) && elements.contains(e.reverse)) {
-	return true
+      for (pair <- e.combinations(2)) {
+	if (pair.charAt(0) != pair.charAt(1) && elements.contains(pair.reverse)) {
+	  return true
+	}
       }
     }
 
     // cycle of length 3
-    val s0 = elements(0)
-    if (s0.charAt(0) != s0.charAt(1)) {
-      for (s1 <- elements) {
-	if (s1.charAt(0) != s1.charAt(1) && s1.charAt(0) == s0.charAt(1)) {
-	  for (s2 <- elements) {
-	    if (s2.charAt(0) != s2.charAt(1) && s2.charAt(0) == s1.charAt(1)
-		&& s0.charAt(0) == s2.charAt(1)) {
-	      return true
+    for (s0 <- elements) {
+      for (pair0 <- s0.combinations(2)) {
+	if (pair0.charAt(0) != pair0.charAt(1)) {
+	  for (s1 <- elements) {
+	    for (pair1 <- s1.combinations(2)) {
+	      if (pair1.charAt(0) != pair1.charAt(1) &&
+		  pair1.charAt(0) == pair0.charAt(1)) {
+		for (s2 <- elements) {
+		  for (pair2 <- s2.combinations(2)) {
+		    if (pair2.charAt(0) != pair2.charAt(1) &&
+			pair2.charAt(0) == pair1.charAt(1) &&
+			pair0.charAt(0) == pair2.charAt(1)) {
+		      return true
+		    }
+		  }
+		}
+	      }
 	    }
 	  }
 	}
