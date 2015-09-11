@@ -41,8 +41,15 @@ object GeneratePermutations {
   }
 
   // sort the string as a combination of strings of length 2
-  def sortedLockIDs(in: String) =
-    new String(List(in.substring(0, 2), in.substring(2, 4), in.substring(4, 6)).sorted.flatten.toArray)
+  def sortedLockIDs(in: String, runLength: Int) = {
+    var i = 0
+    val lockStrs = new ListBuffer[String]
+    while (i < in.size) {
+      lockStrs += in.substring(i, i + runLength)
+      i += runLength
+    }
+    new String(lockStrs.toList.sorted.flatten.toArray)
+  }
 
   def isCyclic(elements: List[String]): Boolean = {
     // cycle of length 2
@@ -86,7 +93,7 @@ object GeneratePermutations {
     // remove isomorphic strings by attempting to match renamings
     val results = new HashSet[String]
     for (choice <- allChoices) {
-      val iso = generateIso(choice).map(s => sortedLockIDs(s)).distinct
+      val iso = generateIso(choice).map(s => sortedLockIDs(s, 2)).distinct
       if (!found(iso, results)) {
 	results += choice
       }
